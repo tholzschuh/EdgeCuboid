@@ -68,7 +68,8 @@ public enum Flag {
 		if (c == null || player == null || flag == null) return false;
 		
 		User user = EdgeCoreAPI.userAPI().getUser(player);
-		if (user != null && Level.canUse(user, Level.TEAM)) return true;
+		if (user != null && c.isOwner(user)) return true;
+		if (user != null && Level.canUse(user, c.getModifyLevel())) return true;
 		
 		return c.getFlags().get(flag).contains(player);
 	}

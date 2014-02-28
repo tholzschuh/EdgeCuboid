@@ -31,8 +31,8 @@ public class HandleWorldEvents implements Listener {
 			Player player = event.getPlayer();
 			User user = EdgeCoreAPI.userAPI().getUser(player.getName());
 			
-			Location to = event.getTo().clone();
-			Location spawnLoc = player.getWorld().getSpawnLocation();
+			Location location = player.getLocation().clone();
+			Location spawnLoc = player.getWorld().getHighestBlockAt(player.getWorld().getSpawnLocation()).getLocation();
 			
 			// Check if user exists and it's level > Architect
 			if (user != null) {
@@ -40,9 +40,9 @@ public class HandleWorldEvents implements Listener {
 					
 					// Get radius and distance to radius
 					int radius = WorldManager.getInstance().getWorldBorder();
-					double distance = to.distance(spawnLoc);
-					
-					if (distance > radius) {
+					double distance = location.distance(spawnLoc);
+										
+					if (distance >= radius) {
 						
 						// Check if the player's in a vehicle
 						Entity vehicle = player.getVehicle();
@@ -58,12 +58,13 @@ public class HandleWorldEvents implements Listener {
 							if (!(vehicle instanceof LivingEntity)) {
 								vehicle.remove();
 							} else {
-								vehicle.teleport(event.getFrom());
+								vehicle.teleport(vehicle.getWorld().getHighestBlockAt(vehicle.getWorld().getSpawnLocation()).getLocation());
+								player.sendMessage(EdgeCoreAPI.languageAPI().getColoredMessage(user.getLanguage(), "radiusreached"));
 							}
 						}
 						
 						// Finally, after all checks, teleport the player to the location it's coming from and let him know why
-						player.teleport(event.getFrom());
+						player.teleport(player.getWorld().getHighestBlockAt(player.getWorld().getSpawnLocation()).getLocation());
 						player.sendMessage(EdgeCoreAPI.languageAPI().getColoredMessage(user.getLanguage(), "radiusreached"));
 					}
 				}
@@ -97,7 +98,7 @@ public class HandleWorldEvents implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void handleFireSpread(BlockSpreadEvent event) {
 		if (!WorldManager.getInstance().isFireSpreadAllowed()) {
-			if (event.getBlock().getType() == Material.FIRE) {
+			if (event.getSource().getType() == Material.FIRE) {
 				
 				event.setCancelled(true);
 				

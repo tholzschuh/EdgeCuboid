@@ -7,10 +7,9 @@ public enum CuboidEvent {
 	MOB(2),
 	HEAL(3),
 	HURT(4),
-	INVIS(6),
-	CRASH(7),
-	NOCHAT(8),
-	NOENTER(9);
+	INVIS(5),
+	NOCHAT(6),
+	NOENTER(7);
 	
 	private int typeID;
 	
@@ -24,7 +23,7 @@ public enum CuboidEvent {
 	
 	public static CuboidEvent[] getCuboidEvents() {
 		
-		CuboidEvent[] types = { CuboidEvent.PVP, CuboidEvent.GOD, CuboidEvent.MOB, CuboidEvent.HEAL, CuboidEvent.HURT, CuboidEvent.INVIS, CuboidEvent.CRASH, CuboidEvent.NOCHAT, CuboidEvent.NOENTER };
+		CuboidEvent[] types = { CuboidEvent.PVP, CuboidEvent.GOD, CuboidEvent.MOB, CuboidEvent.HEAL, CuboidEvent.HURT, CuboidEvent.INVIS, CuboidEvent.NOCHAT, CuboidEvent.NOENTER };
 		return types;
 		
 	}

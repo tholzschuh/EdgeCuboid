@@ -1,0 +1,13 @@
+name: EdgeCuboid
+version: beta_1.83
+author: Panjab
+website: http://edgecraft.de
+
+depend: [EdgeCore]
+softdepend: [EdgeConomy]
+
+main: net.edgecraft.edgecuboid.EdgeCuboid
+
+commands:
+    cuboid:
+      description: Cuboid Command

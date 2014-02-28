@@ -3,12 +3,17 @@ package net.edgecraft.edgecuboid;
 import java.util.logging.Logger;
 
 import net.edgecraft.edgecore.EdgeCore;
+import net.edgecraft.edgecore.EdgeCoreAPI;
+import net.edgecraft.edgecore.command.CommandHandler;
+import net.edgecraft.edgecuboid.commands.CuboidCommand;
 import net.edgecraft.edgecuboid.cuboid.CuboidHandler;
+import net.edgecraft.edgecuboid.events.HandleCommandEvents;
 import net.edgecraft.edgecuboid.events.HandleCuboidEvents;
 import net.edgecraft.edgecuboid.events.HandleCuboidFlags;
 import net.edgecraft.edgecuboid.other.ConfigHandler;
 import net.edgecraft.edgecuboid.other.CuboidSynchronizationTask;
 import net.edgecraft.edgecuboid.other.EventTask;
+import net.edgecraft.edgecuboid.shop.ShopHandler;
 import net.edgecraft.edgecuboid.world.HandleWorldEvents;
 import net.edgecraft.edgecuboid.world.WorldManager;
 
@@ -24,11 +29,11 @@ public class EdgeCuboid extends JavaPlugin {
 	
 	private static final CuboidHandler cuboidAPI = CuboidHandler.getInstance();
 	private static final WorldManager worldAPI = WorldManager.getInstance();
+	private static final ShopHandler shopAPI = ShopHandler.getInstance();
+	private final CommandHandler commands = EdgeCoreAPI.commandsAPI();
 	private final ConfigHandler config = ConfigHandler.getInstance(this);
 	
 	private static boolean eventTaskReady = true;
-	
-	private EdgeCuboid() { /* ... */ }
 	
 	/**
 	 * Is used when the plugin is going to shut down
@@ -56,6 +61,7 @@ public class EdgeCuboid extends JavaPlugin {
 		this.config.update();
 		
 		cuboidAPI.synchronizeCuboidManagement(true, true);
+		shopAPI.synchronizeShops();
 	}
 	
 	/**
@@ -65,8 +71,11 @@ public class EdgeCuboid extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new HandleCuboidEvents(), this);
 		getServer().getPluginManager().registerEvents(new HandleWorldEvents(), this);
 		getServer().getPluginManager().registerEvents(new HandleCuboidFlags(), this);
+		getServer().getPluginManager().registerEvents(new HandleCommandEvents(), this);
+		
+		commands.registerCommand(new CuboidCommand());
 				
-		@SuppressWarnings("unused") BukkitTask eventTask = new EventTask().runTaskTimer(this, 0, 60L);
+		@SuppressWarnings("unused") BukkitTask eventTask = new EventTask().runTaskTimer(this, 10L, 60L);
 		@SuppressWarnings("unused") BukkitTask syncTask = new CuboidSynchronizationTask().runTaskTimer(this, 0, 20L * 60 * 10);
 	}
 	
@@ -92,6 +101,14 @@ public class EdgeCuboid extends JavaPlugin {
 	 */
 	public static WorldManager getWorldAPI() {
 		return worldAPI;
+	}
+	
+	/**
+	 * Returns an instance of the ShopAPI
+	 * @return ShopHandler
+	 */
+	public static ShopHandler getShopAPI() {
+		return shopAPI;
 	}
 	
 	/**

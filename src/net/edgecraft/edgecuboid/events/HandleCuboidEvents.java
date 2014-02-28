@@ -22,7 +22,6 @@ import org.bukkit.event.player.PlayerMoveEvent;
 
 public class HandleCuboidEvents implements Listener {
 	
-	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void handleEvents(PlayerMoveEvent event) {
 		
@@ -47,13 +46,15 @@ public class HandleCuboidEvents implements Listener {
 				
 				if (cuboid != null) {				
 					
-					if (cuboid.isInside(to) && !cuboid.getParticipants().contains(player.getName())) {
+					if (!cuboid.getParticipants().contains(player.getName())) {
 						cuboid.getParticipants().add(player.getName());
 					}
 					
-					if (!cuboid.isInside(to) && cuboid.getParticipants().contains(player.getName())) {
+					if (cuboid.getParticipants().contains(player.getName())) {
 						cuboid.getParticipants().remove(player.getName());
 					}
+					
+					if (cuboid.getParticipants().contains(player.getName())) return; // Do not go further for events if players aren't participant
 					
 					if (cuboid.hasEvent(CuboidEvent.HEAL)) {
 						
@@ -87,13 +88,6 @@ public class HandleCuboidEvents implements Listener {
 									player.hidePlayer(p);
 								}
 						}
-						
-					}
-					
-					if (cuboid.hasEvent(CuboidEvent.CRASH)) {
-						
-						if (!Level.canUse(user, Level.ADMIN))							
-							player.sendBlockChange(player.getLocation(), -1, (byte) -1);
 						
 					}
 					

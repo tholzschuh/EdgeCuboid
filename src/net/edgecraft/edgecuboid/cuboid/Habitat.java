@@ -4,17 +4,20 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import net.edgecraft.edgecuboid.cuboid.types.HabitatType;
 
-public class Habitat {
+public class Habitat implements Serializable {
+	
+	private static final long serialVersionUID = 1l;
 	
 	private Cuboid cuboid;
 	private int cuboidID;
-	private int type;
+	private HabitatType type;
 	private String owner;
 	private String tenant;
 	
@@ -31,7 +34,7 @@ public class Habitat {
 	protected Habitat(Cuboid cuboid, HabitatType type, String owner, String tenant, double worth, boolean buyable, double rental, boolean rentable, Map<Upgrade, Integer> upgrades) {
 		
 		setCuboid(cuboid);
-		setHabitatType(type.getTypeID());
+		setHabitatType(type);
 		setOwner(owner);
 		setTenant(tenant);
 		setWorth(worth);
@@ -95,7 +98,7 @@ public class Habitat {
 		
 		// Put information
 		infoMap.put("cuboid", getCuboid());
-		infoMap.put("habitat-type", getType());
+		infoMap.put("habitat-type", getType().getTypeID());
 		infoMap.put("owner", owner);
 		infoMap.put("tenant", tenant);
 		
@@ -118,7 +121,7 @@ public class Habitat {
 		if (!infoMap.containsKey("object-type") || !infoMap.get("object-type").equals("Habitat")) throw new java.util.UnknownFormatFlagsException("No Habitat");
 		
 		setCuboid((Cuboid) infoMap.get("cuboid"));
-		setHabitatType((int) infoMap.get("habitat-type"));
+		setHabitatType(HabitatType.getType((int) infoMap.get("habitat-type")));
 		setOwner((String) infoMap.get("owner"));
 		setTenant((String) infoMap.get("tenant"));
 		
@@ -131,9 +134,9 @@ public class Habitat {
 
 	/**
 	 * Returns the HabitatType
-	 * @return Integer
+	 * @return HabitatType
 	 */
-	public int getType() {
+	public HabitatType getType() {
 		return type;
 	}
 	
@@ -144,6 +147,15 @@ public class Habitat {
 	public String getOwner() {
 		return owner;
 	}
+	
+	/**
+	 * Checks if the given user is the owner
+	 * @param user
+	 * @return true/false
+	 */
+	public boolean isOwner(String user) {
+		return user.equals(getOwner());
+	}
 
 	/**
 	 * Returns the habitats' tenant (if given)
@@ -151,6 +163,15 @@ public class Habitat {
 	 */
 	public String getTenant() {
 		return tenant;
+	}
+	
+	/**
+	 * Checks if the given user is the tenant
+	 * @param user
+	 * @return true/false
+	 */
+	public boolean isTenant(String user) {
+		return user.equals(getTenant());
 	}
 	
 	/**
@@ -252,9 +273,9 @@ public class Habitat {
 	 * Sets the type
 	 * @param i
 	 */
-	protected void setHabitatType(int i) {
-		if (i >= 0)
-			this.type = i;
+	protected void setHabitatType(HabitatType type) {
+		if (type != null)
+			this.type = type;
 	}
 
 	/**
@@ -296,7 +317,8 @@ public class Habitat {
 	 * @param worth
 	 */
 	protected void setWorth(double worth) {
-		this.worth = worth;
+		if (worth > 0)
+			this.worth = worth;
 	}
 	
 	/**
@@ -321,6 +343,11 @@ public class Habitat {
 	 */
 	public void setBuyable(boolean var) {
 		setBuyableStatus(var);
+		
+		if (isBuyable())
+			setRentableStatus(false);
+		else
+			setRentableStatus(isRentable());
 	}
 
 	/**
@@ -331,7 +358,7 @@ public class Habitat {
 		if (rental > getWorth())
 			this.rental = getWorth();
 		
-		if (rental >= 0)
+		if (rental > 0)
 			this.rental = rental;
 	}
 	

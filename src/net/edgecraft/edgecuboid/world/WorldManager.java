@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 
@@ -12,11 +13,15 @@ public class WorldManager {
 		
 	private int worldBorder;
 	
+	private boolean allowFrameRotation;
 	private boolean allowGlobalBlockInteraction;
 	private boolean allowIceMelting;
 	private boolean allowFireSpread;
 	private boolean allowChunkLoading;
 	private boolean allowStructureGrowing;
+	
+	private Material creationItem;
+	private Material findItem;
 	
 	private static final WorldManager instance = new WorldManager();
 	
@@ -44,6 +49,10 @@ public class WorldManager {
 		return worldBorder;
 	}
 	
+	public boolean isFrameRotationAllowed() {
+		return allowFrameRotation;
+	}
+	
 	public boolean isGlobalBlockInteractionAllowed() {
 		return allowGlobalBlockInteraction;
 	}
@@ -64,8 +73,20 @@ public class WorldManager {
 		return allowStructureGrowing;
 	}
 	
+	public Material getCreationItem() {
+		return creationItem;
+	}
+	
+	public Material getFindItem() {
+		return findItem;
+	}
+	
 	public void setWorldBorder(int radius) {
 		worldBorder = radius;
+	}
+	
+	public void setFrameRotation(boolean allowed) {
+		allowFrameRotation = allowed;
 	}
 	
 	public void setGlobalBlockInteraction(boolean allowed) {
@@ -86,5 +107,13 @@ public class WorldManager {
 	
 	public void setStructureGrowing(boolean allowed) {
 		allowStructureGrowing = allowed;
+	}
+	
+	public void setCreationItem(Material material) {
+		creationItem = material;
+	}
+	
+	public void setFindItem(Material material) {
+		findItem = material;
 	}
 }
