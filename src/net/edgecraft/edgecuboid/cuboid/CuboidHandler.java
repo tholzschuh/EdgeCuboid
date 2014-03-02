@@ -133,7 +133,7 @@ public class CuboidHandler {
 		
 		for (Cuboid c : cuboids.values()) {
 			if (c != null)
-				if (CuboidType.getType(c.getCuboidType()) == CuboidType.PARK || CuboidType.getType(c.getCuboidType()) == CuboidType.SIGHT) amount++;
+				if (CuboidType.getType(c.getCuboidType()) == CuboidType.Park || CuboidType.getType(c.getCuboidType()) == CuboidType.Sight) amount++;
 		}
 		
 		return (int) ((double) amount / amountOfCuboids() * 100);
@@ -148,7 +148,7 @@ public class CuboidHandler {
 		
 		for (Cuboid c : cuboids.values()) {
 			if (c != null)
-				if (CuboidType.getType(c.getCuboidType()) == CuboidType.STREET || CuboidType.getType(c.getCuboidType()) == CuboidType.RAIL) amount++;
+				if (CuboidType.getType(c.getCuboidType()) == CuboidType.Street || CuboidType.getType(c.getCuboidType()) == CuboidType.Rail) amount++;
 		}
 		
 		return (int) ((double) amount / amountOfCuboids() * 100);
@@ -163,10 +163,10 @@ public class CuboidHandler {
 		
 		for (Cuboid c : cuboids.values()) {
 			if (c != null)
-				if (CuboidType.getType(c.getCuboidType()) == CuboidType.PUBLIC || 
-				CuboidType.getType(c.getCuboidType()) == CuboidType.HOSPITAL || 
-				CuboidType.getType(c.getCuboidType()) == CuboidType.POLICE ||
-				CuboidType.getType(c.getCuboidType()) == CuboidType.FIREDEPARTMENT) amount++;
+				if (CuboidType.getType(c.getCuboidType()) == CuboidType.Public || 
+				CuboidType.getType(c.getCuboidType()) == CuboidType.Hospital || 
+				CuboidType.getType(c.getCuboidType()) == CuboidType.PoliceStation ||
+				CuboidType.getType(c.getCuboidType()) == CuboidType.FireDepartment) amount++;
 		}
 		
 		return (int) ((double) amount / amountOfCuboids() * 100);
@@ -349,7 +349,7 @@ public class CuboidHandler {
 	 * @return true/false
 	 */
 	public boolean existsHabitat(Habitat h) {
-		return getCuboids().containsValue(h);
+		return getHabitats().containsValue(h);
 	}
 	
 	/**
@@ -358,7 +358,7 @@ public class CuboidHandler {
 	 * @return true/false
 	 */
 	public boolean existsHabitat(int id) {
-		return getCuboids().containsKey(id);
+		return getHabitats().containsKey(id);
 	}
 	
 	/**
@@ -367,7 +367,11 @@ public class CuboidHandler {
 	 * @return true/false
 	 */
 	public boolean existsHabitat(String name) {
-		return existsCuboid(name);
+		for (Habitat h : getHabitats().values()) {
+			if (h.getCuboid().getName().equals(name)) return true;
+		}
+		
+		return false;
 	}
 	
 	/**

@@ -8,20 +8,20 @@ import net.edgecraft.edgecuboid.cuboid.CuboidEvent;
 
 public enum CuboidType {
 	
-	PUBLIC(0, new CuboidEvent[] { CuboidEvent.PVP }),
-	BANK(1, new CuboidEvent[] { CuboidEvent.PVP }),
-	JAIL(2, new CuboidEvent[] { CuboidEvent.GOD, CuboidEvent.NOCHAT, CuboidEvent.NOENTER }),
-	HOSPITAL(3, new CuboidEvent[] { CuboidEvent.GOD, CuboidEvent.HEAL }),
-	POLICE(4, new CuboidEvent[] { CuboidEvent.PVP, CuboidEvent.HEAL }),
-	FIREDEPARTMENT(5, new CuboidEvent[] { CuboidEvent.PVP, CuboidEvent.HEAL }),
-	ATM(6, new CuboidEvent[] { CuboidEvent.PVP }),
-	SHOP(7, new CuboidEvent[] { CuboidEvent.PVP }),
-	SIGHT(8, new CuboidEvent[] { }),
-	RAIL(9, new CuboidEvent[] { CuboidEvent.NOENTER }),
-	STREET(10, new CuboidEvent[] { }),
-	PARK(11, new CuboidEvent[] { CuboidEvent.PVP }),
-	HABITAT(12, new CuboidEvent[] { CuboidEvent.PVP }),
-	LIFT(13, new CuboidEvent[] { CuboidEvent.GOD, CuboidEvent.NOCHAT });
+	Public(0, new CuboidEvent[] { CuboidEvent.PvP }),
+	Bank(1, new CuboidEvent[] { CuboidEvent.PvP }),
+	Jail(2, new CuboidEvent[] { CuboidEvent.God, CuboidEvent.NoChat, CuboidEvent.NoEnter }),
+	Hospital(3, new CuboidEvent[] { CuboidEvent.God, CuboidEvent.Heal }),
+	PoliceStation(4, new CuboidEvent[] { CuboidEvent.PvP, CuboidEvent.Heal }),
+	FireDepartment(5, new CuboidEvent[] { CuboidEvent.PvP, CuboidEvent.Heal }),
+	ATM(6, new CuboidEvent[] { CuboidEvent.PvP }),
+	Shop(7, new CuboidEvent[] { CuboidEvent.PvP }),
+	Sight(8, new CuboidEvent[] { }),
+	Rail(9, new CuboidEvent[] { CuboidEvent.NoEnter }),
+	Street(10, new CuboidEvent[] { }),
+	Park(11, new CuboidEvent[] { CuboidEvent.PvP }),
+	Habitat(12, new CuboidEvent[] { CuboidEvent.PvP }),
+	Lift(13, new CuboidEvent[] { CuboidEvent.God, CuboidEvent.NoChat });
 	
 	private int typeID;
 	private CuboidEvent[] events;
@@ -47,10 +47,10 @@ public enum CuboidType {
 		
 		CuboidType[] types = 
 			{ 
-				CuboidType.PUBLIC, CuboidType.BANK, CuboidType.JAIL, 
-				CuboidType.HOSPITAL, CuboidType.POLICE, CuboidType.FIREDEPARTMENT, 
-				CuboidType.ATM, CuboidType.SHOP, CuboidType.SIGHT, 
-				CuboidType.RAIL, CuboidType.STREET, CuboidType.PARK, CuboidType.HABITAT 
+				CuboidType.Public, CuboidType.Bank, CuboidType.Jail, 
+				CuboidType.Hospital, CuboidType.PoliceStation, CuboidType.FireDepartment, 
+				CuboidType.ATM, CuboidType.Shop, CuboidType.Sight, 
+				CuboidType.Rail, CuboidType.Street, CuboidType.Park, CuboidType.Habitat 
 			};
 		
 		return types;

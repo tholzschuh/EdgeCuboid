@@ -113,7 +113,7 @@ public class ShopHandler {
 	}
 	
 	public int greatestID() throws Exception {
-		List<Map<String, Object>> tempVar = db.getResults("SELECT COUNT(id) AS amount FROM " + ShopHandler.shopTable);
+		List<Map<String, Object>> tempVar = db.getResults("SELECT COUNT(cuboidid) AS amount FROM " + ShopHandler.shopTable);
 		int tempID = Integer.parseInt(String.valueOf(tempVar.get(0).get("amount")));
 		
 		if (tempID <= 0) return 1;

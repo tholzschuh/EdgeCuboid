@@ -551,7 +551,7 @@ public class Cuboid implements Serializable {
 	 */
 	public void setName(String name) {
 		if (name != null)
-			this.name = CuboidType.getType(getCuboidType()).name().toLowerCase() + "_" + name + "_" + getID();
+			this.name = name;
 	}
 
 	/**
@@ -818,9 +818,4 @@ public class Cuboid implements Serializable {
 		
 		return false;
 	}
-	
-//	@Override
-//	public String toString() {
-//		return "Cuboid {" + getID() + "," + getName() + "," + getOwnerID() + "," + getCenter().getBlockX() + "," + getCenter().getBlockY() + "," + getCenter().getBlockZ() + "," + getWorld().getName() + "}";
-//	}
 }

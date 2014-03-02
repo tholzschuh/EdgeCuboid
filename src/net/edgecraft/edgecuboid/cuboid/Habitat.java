@@ -208,10 +208,18 @@ public class Habitat implements Serializable {
 
 	/**
 	 * Checks if the habitat is able to get rented
-	 * @return
+	 * @return true/false
 	 */
 	public boolean isRentable() {
 		return rentable;
+	}
+	
+	/**
+	 * Returns the taxes which have to be paid
+	 * @return Double
+	 */
+	public double getTaxes() {
+		return Math.round((double) (getCuboid().getArea() / 100) * (getWorth() / 100));
 	}
 	
 	/**

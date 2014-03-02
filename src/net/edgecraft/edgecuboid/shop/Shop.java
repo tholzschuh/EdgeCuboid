@@ -33,8 +33,8 @@ public class Shop implements Serializable {
 	
 	public enum ShopType {
 		
-		STANDARD(false),
-		USER(true);
+		Standard(false),
+		User(true);
 		
 		private boolean buyable;
 		

@@ -48,11 +48,10 @@ public class CuboidCommand extends AbstractCommand {
 				
 				sender.sendMessage(EdgeCore.usageColor + "/cuboid create <name> <type>");
 				sender.sendMessage(EdgeCore.usageColor + "/cuboid recreate <name> [<type>]");
-				sender.sendMessage(EdgeCore.usageColor + "/cuboid delete <name>");
-				sender.sendMessage(EdgeCore.usageColor + "/cuboid participant");
+				sender.sendMessage(EdgeCore.usageColor + "/cuboid delete <cuboid>");
 				sender.sendMessage(EdgeCore.usageColor + "/cuboid commands");
 				sender.sendMessage(EdgeCore.usageColor + "/cuboid edit");
-				sender.sendMessage(EdgeCore.usageColor + "/cuboid switchowner <new owner>");
+				sender.sendMessage(EdgeCore.usageColor + "/cuboid setowner <new owner>");
 				sender.sendMessage(EdgeCore.usageColor + "/cuboid info <name>");
 				sender.sendMessage(EdgeCore.usageColor + "/cuboid types");
 				
@@ -66,6 +65,11 @@ public class CuboidCommand extends AbstractCommand {
 		String userLang = user.getLanguage();
 		
 		if (args[1].equalsIgnoreCase("create")) {
+			if (args.length != 4) {
+				sendUsage(player);
+				return true;
+			}
+			
 			if (cuboidHandler.isCreating(player.getName())) {
 				player.sendMessage(lang.getColoredMessage(userLang, "cuboid_creation_inprogress"));
 				return true;
@@ -77,7 +81,7 @@ public class CuboidCommand extends AbstractCommand {
 			}
 			
 			String name = args[2];
-			CuboidType type = CuboidType.valueOf(args[3].toUpperCase());
+			CuboidType type = CuboidType.valueOf(args[3]);
 			
 			Cuboid c = new Cuboid();
 			
@@ -117,87 +121,9 @@ public class CuboidCommand extends AbstractCommand {
 			return true;			
 		}
 		
-		if (args[1].equalsIgnoreCase("participant")) {
-			
-			if (args.length == 2) {
-				player.sendMessage(EdgeCore.usageColor + "/cuboid participant add <cuboid> <user>");
-				player.sendMessage(EdgeCore.usageColor + "/cuboid participant remove <cuboid> <user>");
-				
-				return true;
-			}
-			
-			if (args[2].equalsIgnoreCase("add")) {
-				
-				Cuboid cuboid = CuboidHandler.getInstance().getCuboid(args[3]);
-				
-				if (cuboid == null) {
-					player.sendMessage(lang.getColoredMessage(userLang, "unknowncuboid").replace("[0]", args[3]));
-					return true;
-				}
-				
-				User part = EdgeCoreAPI.userAPI().getUser(args[4]);
-				
-				if (part == null) {
-					player.sendMessage(lang.getColoredMessage(userLang, "notfound"));
-					return true;
-				}
-				
-				if (cuboid.isParticipant(part.getName())) {
-					player.sendMessage(lang.getColoredMessage(userLang, "cuboid_participant_add_alreadyparticipant"));
-					return true;
-				}
-				
-				if (!Flag.hasFlag(cuboid, Flag.EditCuboids, player.getName())) {
-					player.sendMessage(lang.getColoredMessage(userLang, "cuboid_nopermission_modify"));
-					return true;
-				}
-				
-				cuboid.getParticipants().add(user.getName());
-				player.sendMessage(lang.getColoredMessage(userLang, "cuboid_participant_add_success").replace("[0]", part.getName()));
-				
-				return true;
-			}
-			
-			if (args[2].equalsIgnoreCase("remove")) {
-				
-				Cuboid cuboid = CuboidHandler.getInstance().getCuboid(args[3]);
-				
-				if (cuboid == null) {
-					player.sendMessage(lang.getColoredMessage(userLang, "unknowncuboid").replace("[0]", args[3]));
-					return true;
-				}
-				
-				User part = EdgeCoreAPI.userAPI().getUser(args[4]);
-				
-				if (part == null) {
-					player.sendMessage(lang.getColoredMessage(userLang, "notfound"));
-					return true;
-				}
-				
-				if (!cuboid.isParticipant(part.getName())) {
-					player.sendMessage(lang.getColoredMessage(userLang, "cuboid_participant_remove_noparticipant"));
-					return true;
-				}
-				
-				if (!Flag.hasFlag(cuboid, Flag.EditCuboids, player.getName())) {
-					player.sendMessage(lang.getColoredMessage(userLang, "cuboid_nopermission_modify"));
-					return true;
-				}
-				
-				cuboid.getParticipants().remove(user.getName());
-				player.sendMessage(lang.getColoredMessage(userLang, "cuboid_participant_remove_success").replace("[0]", part.getName()));
-				
-				return true;
-			}
-		}
-		
 		if (args[1].equalsIgnoreCase("command")) {
-			
 			if (args.length == 2) {
-				player.sendMessage(EdgeCore.usageColor + "/cuboid command add <cuboid> <command[,..]>");
-				player.sendMessage(EdgeCore.usageColor + "/cuboid command remove <cuboid> <command[,..]>");
-				player.sendMessage(EdgeCore.usageColor + "/cuboid command check <cuboid> <command>");
-				
+				sendUsage(player);
 				return true;
 			}
 			
@@ -223,7 +149,7 @@ public class CuboidCommand extends AbstractCommand {
 					cuboid.allowCommand(command);
 				}
 				
-				player.sendMessage(lang.getColoredMessage(userLang, "cuboid_command_allow_success"));
+				player.sendMessage(lang.getColoredMessage(userLang, "admin_cuboid_command_allow_success"));
 				
 				return true;
 			}
@@ -250,7 +176,7 @@ public class CuboidCommand extends AbstractCommand {
 					cuboid.disallowCommand(command);
 				}
 				
-				player.sendMessage(lang.getColoredMessage(userLang, "cuboid_command_disallow_success"));
+				player.sendMessage(lang.getColoredMessage(userLang, "admin_cuboid_command_disallow_success"));
 				
 				return true;
 			}
@@ -271,11 +197,11 @@ public class CuboidCommand extends AbstractCommand {
 				
 				if (cuboid.isCommandAllowed(args[4])) {
 					
-					player.sendMessage(lang.getColoredMessage(userLang, "cuboid_command_check_true").replace("[0]", "/" + args[4]));
+					player.sendMessage(lang.getColoredMessage(userLang, "admin_cuboid_command_check_true").replace("[0]", "/" + args[4]));
 					
 				} else {
 					
-					player.sendMessage(lang.getColoredMessage(userLang, "cuboid_command_check_false").replace("[0]", "/" + args[4]));
+					player.sendMessage(lang.getColoredMessage(userLang, "admin_cuboid_command_check_false").replace("[0]", "/" + args[4]));
 					
 				}
 				
@@ -283,12 +209,9 @@ public class CuboidCommand extends AbstractCommand {
 			}
 		}
 		
-		if (args[1].equalsIgnoreCase("edit")) {
-			
+		if (args[1].equalsIgnoreCase("edit")) {			
 			if (args.length == 2) {
-				player.sendMessage(EdgeCore.usageColor + "/cuboid edit entermsg <cuboid> <enter message>");
-				player.sendMessage(EdgeCore.usageColor + "/cuboid edit leavemsg <cuboid> <leave message>");
-				
+				sendUsage(player);
 				return true;
 			}
 			
@@ -315,7 +238,7 @@ public class CuboidCommand extends AbstractCommand {
 				}
 				
 				cuboid.updateEnterMessage(sb.toString());				
-				player.sendMessage(lang.getColoredMessage(userLang, "cuboid_edit_entermsg_success").replace("[0]", sb.toString()));
+				player.sendMessage(lang.getColoredMessage(userLang, "admin_cuboid_edit_entermsg_success").replace("[0]", sb.toString()));
 				
 				return true;
 			}
@@ -343,13 +266,17 @@ public class CuboidCommand extends AbstractCommand {
 				}
 				
 				cuboid.updateEnterMessage(sb.toString());				
-				player.sendMessage(lang.getColoredMessage(userLang, "cuboid_edit_leavermsg_success").replace("[0]", sb.toString()));
+				player.sendMessage(lang.getColoredMessage(userLang, "admin_cuboid_edit_leavermsg_success").replace("[0]", sb.toString()));
 				
 				return true;
 			}
 		}
 		
-		if (args[1].equalsIgnoreCase("switchowner")) {
+		if (args[1].equalsIgnoreCase("setowner")) {
+			if (args.length != 4) {
+				sendUsage(player);
+				return true;
+			}
 			
 			Cuboid cuboid = cuboidHandler.getCuboid(args[2]);
 			User newOwner = EdgeCoreAPI.userAPI().getUser(args[3]);
@@ -365,17 +292,21 @@ public class CuboidCommand extends AbstractCommand {
 			}
 			
 			if (cuboid.isOwner(newOwner)) {
-				player.sendMessage(lang.getColoredMessage(userLang, "cuboid_switchowner_alreadyowner"));
+				player.sendMessage(lang.getColoredMessage(userLang, "admin_cuboid_setowner_alreadyowner"));
 				return true;
 			}
 			
 			cuboid.switchOwner(newOwner.getID());
-			player.sendMessage(lang.getColoredMessage(userLang, "cuboid_switchowner_success").replace("[0]", newOwner.getName()).replace("[1]", cuboid.getName()));
+			player.sendMessage(lang.getColoredMessage(userLang, "admin_cuboid_setowner_success").replace("[0]", newOwner.getName()).replace("[1]", cuboid.getName()));
 			
 			return true;
 		}
 		
 		if (args[1].equalsIgnoreCase("info")) {
+			if (args.length != 3) {
+				sendUsage(player);
+				return true;
+			}
 			
 			Cuboid cuboid = cuboidHandler.getCuboid(args[2]);
 			
@@ -384,15 +315,15 @@ public class CuboidCommand extends AbstractCommand {
 				return true;
 			}
 			
-			player.sendMessage(lang.getColoredMessage(userLang, "cuboid_info_title").replace("[0]", args[2]));
-			player.sendMessage(lang.getColoredMessage(userLang, "cuboid_info_name").replace("[0]", args[2]));
-			player.sendMessage(lang.getColoredMessage(userLang, "cuboid_info_type").replace("[0]", CuboidType.getType(cuboid.getCuboidType()).name()));
-			player.sendMessage(lang.getColoredMessage(userLang, "cuboid_info_owner").replace("[0]", cuboid.getOwner().getName()));
-			player.sendMessage(lang.getColoredMessage(userLang, "cuboid_info_center").replace("[0]", cuboid.getCenter().getBlockX() + "")
+			player.sendMessage(lang.getColoredMessage(userLang, "admin_cuboid_info_title").replace("[0]", args[2]));
+			player.sendMessage(lang.getColoredMessage(userLang, "admin_cuboid_info_name").replace("[0]", args[2]));
+			player.sendMessage(lang.getColoredMessage(userLang, "admin_cuboid_info_type").replace("[0]", CuboidType.getType(cuboid.getCuboidType()).name()));
+			player.sendMessage(lang.getColoredMessage(userLang, "admin_cuboid_info_owner").replace("[0]", cuboid.getOwner().getName()));
+			player.sendMessage(lang.getColoredMessage(userLang, "admin_cuboid_info_center").replace("[0]", cuboid.getCenter().getBlockX() + "")
 																					.replace("[1]", cuboid.getCenter().getBlockY() + "")
 																					.replace("[2]", cuboid.getCenter().getBlockZ() + ""));
-			player.sendMessage(lang.getColoredMessage(userLang, "cuboid_info_blocks").replace("[0]", cuboid.getArea() + "").replace("[1]", cuboid.getVolume() + ""));
-			player.sendMessage(lang.getColoredMessage(userLang, "cuboid_info_participants").replace("[0]", cuboid.getParticipants().size() + ""));
+			player.sendMessage(lang.getColoredMessage(userLang, "admin_cuboid_info_blocks").replace("[0]", cuboid.getArea() + "").replace("[1]", cuboid.getVolume() + ""));
+			player.sendMessage(lang.getColoredMessage(userLang, "admin_cuboid_info_participants").replace("[0]", cuboid.getParticipants().size() + ""));
 			
 			return true;
 		}
@@ -403,12 +334,12 @@ public class CuboidCommand extends AbstractCommand {
 			
 			for (CuboidType type : CuboidType.getCuboidTypes()) {
 				if (sb.length() > 0)
-					sb.append(",");
+					sb.append(", ");
 				
 				sb.append(ChatColor.GOLD + type.name());
 			}
 			
-			player.sendMessage(lang.getColoredMessage(userLang, "cuboid_typelist").replace("[0]", sb.toString()));
+			player.sendMessage(lang.getColoredMessage(userLang, "admin_cuboid_typelist").replace("[0]", sb.toString()));
 			
 			return true;
 		}

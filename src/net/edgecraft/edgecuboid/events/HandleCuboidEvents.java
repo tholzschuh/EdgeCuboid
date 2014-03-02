@@ -56,7 +56,7 @@ public class HandleCuboidEvents implements Listener {
 					
 					if (cuboid.getParticipants().contains(player.getName())) return; // Do not go further for events if players aren't participant
 					
-					if (cuboid.hasEvent(CuboidEvent.HEAL)) {
+					if (cuboid.hasEvent(CuboidEvent.Heal)) {
 						
 						double health = player.getHealth() + 2D;					
 						if (health >= 20) health = 20;
@@ -65,7 +65,7 @@ public class HandleCuboidEvents implements Listener {
 						
 					}
 					
-					if (cuboid.hasEvent(CuboidEvent.HURT)) {
+					if (cuboid.hasEvent(CuboidEvent.Hurt)) {
 						
 						if (player.getGameMode() == GameMode.CREATIVE)
 							player.setHealth(player.getHealth());
@@ -77,7 +77,7 @@ public class HandleCuboidEvents implements Listener {
 						
 					}
 					
-					if (cuboid.hasEvent(CuboidEvent.INVIS)) {
+					if (cuboid.hasEvent(CuboidEvent.Invis)) {
 						
 						for (Player p : Bukkit.getOnlinePlayers()) {
 							
@@ -91,7 +91,7 @@ public class HandleCuboidEvents implements Listener {
 						
 					}
 					
-					if (cuboid.hasEvent(CuboidEvent.NOENTER)) {						
+					if (cuboid.hasEvent(CuboidEvent.NoEnter)) {						
 						if (!Level.canUse(user, Level.TEAM)) {	
 							
 							if (!cuboid.isInside(from) && cuboid.isInside(to)) 
@@ -119,7 +119,7 @@ public class HandleCuboidEvents implements Listener {
 				
 				if (cuboid != null) {
 					
-					if (cuboid.hasEvent(CuboidEvent.GOD)) {
+					if (cuboid.hasEvent(CuboidEvent.God)) {
 						event.setCancelled(true);
 					}
 					
@@ -127,7 +127,7 @@ public class HandleCuboidEvents implements Listener {
 						
 						Entity damager = ((EntityDamageByEntityEvent) event).getDamager();
 						
-						if (!cuboid.hasEvent(CuboidEvent.PVP)) {
+						if (!cuboid.hasEvent(CuboidEvent.PvP)) {
 							
 							if (damager instanceof Arrow) {
 								
@@ -160,7 +160,7 @@ public class HandleCuboidEvents implements Listener {
 				Cuboid cuboid = Cuboid.getCuboid(player);
 				
 				if (cuboid != null) {				
-					if (cuboid.hasEvent(CuboidEvent.NOCHAT) && cuboid.getParticipants().contains(player.getName())) {
+					if (cuboid.hasEvent(CuboidEvent.NoChat) && cuboid.getParticipants().contains(player.getName())) {
 						
 						if (!Level.canUse(user, Level.TEAM)) {
 							

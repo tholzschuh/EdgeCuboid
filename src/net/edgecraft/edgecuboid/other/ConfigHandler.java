@@ -35,9 +35,10 @@ public class ConfigHandler {
 		getConfig().addDefault("Command.ccancel", Level.ARCHITECT.name());
 		getConfig().addDefault("Command.cfind", Level.USER.name());
 		getConfig().addDefault("Command.cuboid", Level.ARCHITECT.name());
-		getConfig().addDefault("Command.flags", Level.ARCHITECT.name());
-		getConfig().addDefault("Command.events", Level.ARCHITECT.name());
-		getConfig().addDefault("Command.habitat", Level.USER.name());
+		getConfig().addDefault("Command.flag", Level.ARCHITECT.name());
+		getConfig().addDefault("Command.event", Level.ARCHITECT.name());
+		getConfig().addDefault("Command.habitat", Level.ARCHITECT.name());
+		getConfig().addDefault("Command.home", Level.USER.name());
 		getConfig().addDefault("Command.upgrade", Level.USER.name());
 		getConfig().addDefault("Command.rail", Level.ARCHITECT.name());
 		getConfig().addDefault("Command.street", Level.ARCHITECT.name());
