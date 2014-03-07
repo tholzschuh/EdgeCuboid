@@ -23,7 +23,7 @@ public class HabitatCommand extends AbstractCommand {
 	
 	@Override
 	public Level getLevel() {
-		return Level.valueOf(EdgeCuboid.getInstance().getConfig().getString("Command.cuboid"));
+		return Level.valueOf(EdgeCuboid.getInstance().getConfig().getString("Command.habitat"));
 	}
 	
 	@Override
@@ -34,7 +34,7 @@ public class HabitatCommand extends AbstractCommand {
 	
 	@Override
 	public boolean validArgsRange(String[] args) {
-		return (args.length > 1 && args.length < 5);
+		return (args.length > 1 && args.length < 6);
 	}
 	
 	@Override

@@ -52,6 +52,11 @@ public class CFindCommand extends AbstractCommand {
 		
 		String userLang = user.getLanguage();
 		
+		if (!Level.canUse(user, getLevel())) {
+			player.sendMessage(lang.getColoredMessage(userLang, "nopermission"));
+			return true;
+		}
+		
 		if (cuboidHandler.isSearching(player.getName())) {
 			player.sendMessage(lang.getColoredMessage(userLang, "cuboid_find_stop"));
 			cuboidHandler.getSearchingPlayers().remove(player.getName());

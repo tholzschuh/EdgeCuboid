@@ -57,6 +57,11 @@ public class EventCommand extends AbstractCommand {
 		
 		String userLang = user.getLanguage();
 		
+		if (!Level.canUse(user, getLevel())) {
+			player.sendMessage(lang.getColoredMessage(userLang, "nopermission"));
+			return true;
+		}
+		
 		if (args[1].equalsIgnoreCase("toggle")) {
 			if (args.length != 4) {
 				sendUsage(player);
@@ -70,7 +75,7 @@ public class EventCommand extends AbstractCommand {
 				return true;
 			}
 			
-			CuboidEvent event = CuboidEvent.valueOf(args[3].toUpperCase());
+			CuboidEvent event = CuboidEvent.valueOf(args[3]);
 			
 			if (CuboidEvent.hasEvent(cuboid, event)) {
 				
@@ -104,7 +109,7 @@ public class EventCommand extends AbstractCommand {
 					if (sb.length() > 0)
 						sb.append(ChatColor.WHITE + ", ");
 					
-					sb.append(CuboidEvent.hasEvent(cuboid, event) ? ChatColor.RED : ChatColor.GREEN);
+					sb.append(CuboidEvent.hasEvent(cuboid, event) ? ChatColor.GREEN : ChatColor.RED);
 					sb.append(event.name());
 				}
 				
@@ -115,8 +120,10 @@ public class EventCommand extends AbstractCommand {
 			
 			if (args.length == 4) {
 				
-				CuboidEvent event = CuboidEvent.valueOf(args[3].toUpperCase());
-				String msg = CuboidEvent.hasEvent(cuboid, event) ? lang.getColoredMessage(userLang, "event_status_event_false") : lang.getColoredMessage(userLang, "event_status_event_true");
+				CuboidEvent event = CuboidEvent.valueOf(args[3]);
+				String msg = CuboidEvent.hasEvent(cuboid, event) 
+								? lang.getColoredMessage(userLang, "event_status_event_true").replace("[0]", args[3]) 
+								: lang.getColoredMessage(userLang, "event_status_event_false").replace("[0]", args[3]);
 				
 				player.sendMessage(msg);
 				

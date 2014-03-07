@@ -1,9 +1,11 @@
 package net.edgecraft.edgecuboid.other;
 
 import java.io.File;
+import java.util.Arrays;
 
 import net.edgecraft.edgecore.command.Level;
 import net.edgecraft.edgecuboid.EdgeCuboid;
+import net.edgecraft.edgecuboid.shop.ShopHandler;
 import net.edgecraft.edgecuboid.world.WorldManager;
 
 import org.bukkit.Material;
@@ -42,6 +44,8 @@ public class ConfigHandler {
 		getConfig().addDefault("Command.upgrade", Level.USER.name());
 		getConfig().addDefault("Command.rail", Level.ARCHITECT.name());
 		getConfig().addDefault("Command.street", Level.ARCHITECT.name());
+		getConfig().addDefault("Command.shop", Level.USER.name());
+		getConfig().addDefault("Command.home", Level.USER.name());
 		
 		getConfig().addDefault("World.BorderRadius", 1000);
 		getConfig().addDefault("World.AllowFrameRotation", false);
@@ -53,6 +57,16 @@ public class ConfigHandler {
 		
 		getConfig().addDefault("Cuboid.CreationItem", Material.STICK.name());
 		getConfig().addDefault("Cuboid.FindItem", Material.BLAZE_ROD.name());
+		
+		String[] defaultFrames = new String[] { Material.WOOD_STAIRS.name(), Material.COBBLESTONE_STAIRS.name(), 
+													Material.BIRCH_WOOD_STAIRS.name(), Material.DARK_OAK_STAIRS.name(), 
+													Material.JUNGLE_WOOD_STAIRS.name(), Material.SPRUCE_WOOD_STAIRS.name(), 
+													Material.NETHER_BRICK_STAIRS.name(), Material.QUARTZ_STAIRS.name(), 
+													Material.SANDSTONE_STAIRS.name(), Material.BRICK_STAIRS.name(), 
+													Material.SMOOTH_STAIRS.name() };
+		
+		getConfig().addDefault("Shop.FrameItems", Arrays.asList(defaultFrames));
+		getConfig().addDefault("Shop.LooseInvOnDeath", false);
 		
 		getConfig().options().copyDefaults(true);
 		getPlugin().saveConfig();
@@ -78,6 +92,8 @@ public class ConfigHandler {
 		WorldManager.getInstance().setCreationItem(Material.getMaterial(getConfig().getString("Cuboid.CreationItem")));
 		WorldManager.getInstance().setFindItem(Material.getMaterial(getConfig().getString("Cuboid.FindItem")));
 		
+		ShopHandler.setShopFrames(getConfig().getStringList("Shop.FrameItems"));
+		ShopHandler.toggleInventoryLoosing(getConfig().getBoolean("Shop.LooseInvOnDeath"));
 	}
 	
 	/**

@@ -57,6 +57,11 @@ public class FlagCommand extends AbstractCommand {
 		
 		String userLang = user.getLanguage();
 		
+		if (!Level.canUse(user, getLevel())) {
+			player.sendMessage(lang.getColoredMessage(userLang, "nopermission"));
+			return true;
+		}
+		
 		if (args[1].equalsIgnoreCase("toggle")) {
 			if (args.length != 5) {
 				sendUsage(player);

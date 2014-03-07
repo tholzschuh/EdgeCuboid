@@ -19,7 +19,7 @@ import net.edgecraft.edgecore.EdgeCoreAPI;
 import net.edgecraft.edgecore.lang.LanguageHandler;
 import net.edgecraft.edgecore.user.User;
 import net.edgecraft.edgecuboid.cuboid.Cuboid;
-import net.edgecraft.edgecuboid.serializable.EdgeItemStack;
+import net.edgecraft.edgecuboid.other.EdgeItemStack;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -143,6 +143,15 @@ public class Shop implements Serializable {
 		
 	}
 	
+	public static Shop getShop(String player) {
+		for (Shop shop : ShopHandler.getInstance().getShops().values()) {
+			if (shop.isOwner(player))
+				return shop;
+		}
+		
+		return null;
+	}
+	
 	public Cuboid getCuboid() {
 		return cuboid;
 	}
@@ -179,6 +188,10 @@ public class Shop implements Serializable {
 	public double getPrice() {
 		calculatePrice();
 		return price;
+	}
+	
+	public double getTaxes() {
+		return Math.round((double) getPrice() / 100 * Economy.getStateTax());
 	}
 	
 	private void calculatePrice() {

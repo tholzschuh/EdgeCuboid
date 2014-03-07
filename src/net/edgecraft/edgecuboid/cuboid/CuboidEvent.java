@@ -1,6 +1,8 @@
 package net.edgecraft.edgecuboid.cuboid;
 
-public enum CuboidEvent {
+import java.io.Serializable;
+
+public enum CuboidEvent implements Serializable {
 	
 	PvP(0),
 	God(1),

@@ -19,6 +19,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.util.Vector;
 
 public class HandleCuboidEvents implements Listener {
 	
@@ -32,7 +33,7 @@ public class HandleCuboidEvents implements Listener {
 			Location to = event.getTo();
 			
 			User user = EdgeCoreAPI.userAPI().getUser(player.getName());
-			Cuboid cuboid = Cuboid.getCuboid(player);
+			Cuboid cuboid = Cuboid.getCuboid(player.getLocation());
 			
 			if (user != null) {
 				
@@ -45,16 +46,16 @@ public class HandleCuboidEvents implements Listener {
 				} 
 				
 				if (cuboid != null) {				
+										
+					if (!cuboid.isInside(event.getTo()) && cuboid.getParticipants().contains(player.getName())) {
+						cuboid.getParticipants().remove(player.getName());
+					}
 					
 					if (!cuboid.getParticipants().contains(player.getName())) {
 						cuboid.getParticipants().add(player.getName());
 					}
-					
-					if (cuboid.getParticipants().contains(player.getName())) {
-						cuboid.getParticipants().remove(player.getName());
-					}
-					
-					if (cuboid.getParticipants().contains(player.getName())) return; // Do not go further for events if players aren't participant
+										
+					if (!cuboid.getParticipants().contains(player.getName())) return; // Do not go further for events if players aren't participant
 					
 					if (cuboid.hasEvent(CuboidEvent.Heal)) {
 						
@@ -84,20 +85,25 @@ public class HandleCuboidEvents implements Listener {
 							User u = EdgeCoreAPI.userAPI().getUser(p.getName());
 							
 							if (u != null)
-								if (!Level.canUse(u, Level.TEAM)) {
-									player.hidePlayer(p);
-								}
+								player.hidePlayer(p);
 						}
 						
 					}
 					
 					if (cuboid.hasEvent(CuboidEvent.NoEnter)) {						
-						if (!Level.canUse(user, Level.TEAM)) {	
-							
-							if (!cuboid.isInside(from) && cuboid.isInside(to)) 
-								player.teleport(from);
-								
+						if (!Level.canUse(user, Level.ARCHITECT)) {	
+							if (!cuboid.isInside(from) && cuboid.isInside(to)) {
+								Vector unit = player.getLocation().toVector().subtract(player.getLocation().toVector()).normalize();
+								player.setVelocity(unit.multiply(2));
+							}
 						}						
+					}
+					
+					if (!Level.canUse(user, cuboid.getModifyLevel())) {
+						if (!cuboid.isInside(from) && cuboid.isInside(to)) {
+							Vector unit = player.getLocation().toVector().subtract(player.getLocation().toVector()).normalize();
+							player.setVelocity(unit.multiply(2));
+						}
 					}
 				}				
 			}
@@ -115,7 +121,7 @@ public class HandleCuboidEvents implements Listener {
 			if (entity instanceof Player) {
 				
 				Player player = (Player) entity;
-				Cuboid cuboid = Cuboid.getCuboid(player);
+				Cuboid cuboid = Cuboid.getCuboid(player.getLocation());
 				
 				if (cuboid != null) {
 					
@@ -157,12 +163,13 @@ public class HandleCuboidEvents implements Listener {
 			
 			if (user != null) {
 				
-				Cuboid cuboid = Cuboid.getCuboid(player);
+				Cuboid cuboid = Cuboid.getCuboid(player.getLocation());
 				
 				if (cuboid != null) {				
+					System.out.println(cuboid.hasEvent(CuboidEvent.NoChat) + " - " + cuboid.getParticipants().contains(player.getName()));
 					if (cuboid.hasEvent(CuboidEvent.NoChat) && cuboid.getParticipants().contains(player.getName())) {
 						
-						if (!Level.canUse(user, Level.TEAM)) {
+						if (!Level.canUse(user, Level.SUPPORTER)) {
 							
 							event.getRecipients().remove(player.getName());
 							event.setCancelled(true);

@@ -38,7 +38,7 @@ public class HandleCuboidFlags implements Listener {
 		
 		if (user != null) {
 			
-			Cuboid cuboid = Cuboid.getCuboid(player);
+			Cuboid cuboid = Cuboid.getCuboid(player.getLocation());
 			
 			if (cuboid == null ) {
 				if (!WorldManager.getInstance().isGlobalBlockInteractionAllowed()) {
@@ -68,7 +68,7 @@ public class HandleCuboidFlags implements Listener {
 		
 		if (user != null) {
 			
-			Cuboid cuboid = Cuboid.getCuboid(player);
+			Cuboid cuboid = Cuboid.getCuboid(player.getLocation());
 			
 			if (cuboid == null ) {
 				if (!WorldManager.getInstance().isGlobalBlockInteractionAllowed()) {
@@ -100,7 +100,7 @@ public class HandleCuboidFlags implements Listener {
 						
 			if (user != null && event.getItem() != null) {
 				
-				Cuboid cuboid = Cuboid.getCuboid(player);
+				Cuboid cuboid = Cuboid.getCuboid(player.getLocation());
 				Material material = event.getItem().getType();
 				String item = material.name().toLowerCase();
 				
@@ -109,7 +109,7 @@ public class HandleCuboidFlags implements Listener {
 					material == Material.FIRE || material == Material.FIREBALL || material == Material.FLINT_AND_STEEL) {
 					
 					if (cuboid == null) {
-						if (!Level.canUse(user, Level.TEAM)) {
+						if (!Level.canUse(user, Level.ARCHITECT)) {
 							
 							player.sendMessage(lang.getColoredMessage(user.getLanguage(), "cuboid_illegalplacement").replace("[0]", item));
 							event.setCancelled(true);
@@ -144,7 +144,7 @@ public class HandleCuboidFlags implements Listener {
 				
 				if (user != null) {
 					
-					Cuboid cuboid = Cuboid.getCuboid(player);
+					Cuboid cuboid = Cuboid.getCuboid(player.getLocation());
 					
 					if (cuboid != null) {
 						if (!Flag.hasFlag(cuboid, Flag.UseContainer, player.getName())) {
@@ -171,7 +171,7 @@ public class HandleCuboidFlags implements Listener {
 		
 		if (user != null && caught instanceof Fish) {
 			
-			Cuboid cuboid = Cuboid.getCuboid(player);
+			Cuboid cuboid = Cuboid.getCuboid(player.getLocation());
 			
 			if (cuboid != null) {
 				if (!Flag.hasFlag(cuboid, Flag.InteractAnimals, player.getName())) {
@@ -192,7 +192,7 @@ public class HandleCuboidFlags implements Listener {
 		
 		if (user != null) {
 			
-			Cuboid cuboid = Cuboid.getCuboid(player);
+			Cuboid cuboid = Cuboid.getCuboid(player.getLocation());
 			
 			if (cuboid != null) {
 				if (!Flag.hasFlag(cuboid, Flag.UseBuckets, player.getName())) {
@@ -211,14 +211,14 @@ public class HandleCuboidFlags implements Listener {
 		Block b = event.getClickedBlock();
 		
 		if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-			if (b.getType() == Material.LEVER || b.getType() == Material.TRAP_DOOR || b.getType() == Material.STONE_BUTTON || b.getType() == Material.WOOD_BUTTON) {
+			if (b.getType() == Material.LEVER || b.getType() == Material.FENCE_GATE || b.getType() == Material.TRAP_DOOR || b.getType() == Material.STONE_BUTTON || b.getType() == Material.WOOD_BUTTON) {
 				
 				Player player = event.getPlayer();
 				User user = EdgeCoreAPI.userAPI().getUser(player.getName());
 				
 				if (user != null) {
 					
-					Cuboid cuboid = Cuboid.getCuboid(player);
+					Cuboid cuboid = Cuboid.getCuboid(player.getLocation());
 					
 					if (cuboid == null) {
 						if (!Level.canUse(user, Level.ARCHITECT)) {
@@ -257,7 +257,7 @@ public class HandleCuboidFlags implements Listener {
 			
 			if (user != null) {
 				
-				Cuboid cuboid = Cuboid.getCuboid(player);
+				Cuboid cuboid = Cuboid.getCuboid(player.getLocation());
 				
 				if (cuboid != null) {
 					if (!Flag.hasFlag(cuboid, Flag.InteractAnimals, player.getName())) {

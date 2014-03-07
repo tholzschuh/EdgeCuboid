@@ -9,6 +9,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,8 +19,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.world.StructureGrowEvent;
+import org.bukkit.util.Vector;
 
 public class HandleWorldEvents implements Listener {
 	
@@ -58,13 +62,15 @@ public class HandleWorldEvents implements Listener {
 							if (!(vehicle instanceof LivingEntity)) {
 								vehicle.remove();
 							} else {
-								vehicle.teleport(vehicle.getWorld().getHighestBlockAt(vehicle.getWorld().getSpawnLocation()).getLocation());
+								Vector unit = event.getFrom().toVector().subtract(event.getTo().toVector()).normalize();
+								vehicle.setVelocity(unit.multiply(2));
 								player.sendMessage(EdgeCoreAPI.languageAPI().getColoredMessage(user.getLanguage(), "radiusreached"));
 							}
 						}
 						
 						// Finally, after all checks, teleport the player to the location it's coming from and let him know why
-						player.teleport(player.getWorld().getHighestBlockAt(player.getWorld().getSpawnLocation()).getLocation());
+						Vector unit = event.getFrom().toVector().subtract(event.getTo().toVector()).normalize();
+						player.setVelocity(unit.multiply(2));
 						player.sendMessage(EdgeCoreAPI.languageAPI().getColoredMessage(user.getLanguage(), "radiusreached"));
 					}
 				}
@@ -112,6 +118,28 @@ public class HandleWorldEvents implements Listener {
 			
 			event.setCancelled(true);
 			
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void handleItemFrameRotation(PlayerInteractEntityEvent event) {
+		
+		Player player = event.getPlayer();
+		User user = EdgeCoreAPI.userAPI().getUser(player.getName());
+		
+		if (user == null)
+			return;
+		
+		if (event.getRightClicked().getType() == EntityType.ITEM_FRAME) {
+			
+			ItemFrame frame = (ItemFrame) event.getRightClicked();
+			
+			if (frame.getItem() == null || frame.getItem().getType() == Material.AIR)
+				return;
+			
+			if (!Level.canUse(user, Level.ARCHITECT)) {
+				event.setCancelled(true);
+			}
 		}
 	}
 }

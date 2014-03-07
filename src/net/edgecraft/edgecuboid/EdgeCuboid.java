@@ -65,7 +65,6 @@ public class EdgeCuboid extends JavaPlugin {
 		this.config.loadConfig();
 		this.config.update();
 		
-		cuboidAPI.synchronizeCuboidManagement(true, true);
 		shopAPI.synchronizeShops();
 	}
 	
@@ -84,8 +83,8 @@ public class EdgeCuboid extends JavaPlugin {
 		commands.registerCommand(new EventCommand());
 		commands.registerCommand(new FlagCommand());
 		commands.registerCommand(new HabitatCommand());
-				
-		@SuppressWarnings("unused") BukkitTask eventTask = new EventTask().runTaskTimer(this, 10L, 60L);
+		
+		@SuppressWarnings("unused") BukkitTask eventTask = new EventTask().runTaskTimer(this, 0L, 20L);
 		@SuppressWarnings("unused") BukkitTask syncTask = new CuboidSynchronizationTask().runTaskTimer(this, 0, 20L * 60 * 10);
 	}
 	

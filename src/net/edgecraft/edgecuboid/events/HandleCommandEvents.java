@@ -55,7 +55,7 @@ public class HandleCommandEvents implements Listener {
 							
 							CuboidHandler.getInstance().registerCuboid(creation.getName(), creation.getOwnerID(), 
 																CuboidType.getType(creation.getCuboidType()), creation.getModifyLevel(), creation.getMinLocation(), 
-																creation.getMaxLocation(), "", "", null, null, null);
+																creation.getMaxLocation(), "", "", null, null, null, null);
 							
 							CuboidHandler.getInstance().getCreatingPlayers().remove(player.getName());
 							
@@ -100,22 +100,23 @@ public class HandleCommandEvents implements Listener {
 				
 				if (material == WorldManager.getInstance().getFindItem()) {
 					
-					Cuboid cuboid = Cuboid.getCuboid(player);
+					Cuboid cuboid = Cuboid.getCuboid(event.getClickedBlock().getLocation());
 					
 					if (cuboid == null) {						
 						event.setCancelled(true);
-						player.sendMessage(lang.getColoredMessage(user.getLanguage(), "cuboid_find_nocuboid"));						
+						player.sendMessage(lang.getColoredMessage(user.getLanguage(), "cuboid_find_nocuboid"));
+						return;
 					}
 					
-					player.sendMessage(lang.getColoredMessage(userLang, "cuboid_info_title").replace("[0]", cuboid.getName()));
-					player.sendMessage(lang.getColoredMessage(userLang, "cuboid_info_name").replace("[0]", cuboid.getName()));
-					player.sendMessage(lang.getColoredMessage(userLang, "cuboid_info_type").replace("[0]", CuboidType.getType(cuboid.getCuboidType()).name()));
-					player.sendMessage(lang.getColoredMessage(userLang, "cuboid_info_owner").replace("[0]", cuboid.getOwner().getName()));
-					player.sendMessage(lang.getColoredMessage(userLang, "cuboid_info_center").replace("[0]", cuboid.getCenter().getBlockX() + "")
+					player.sendMessage(lang.getColoredMessage(userLang, "admin_cuboid_info_title").replace("[0]", cuboid.getName()));
+					player.sendMessage(lang.getColoredMessage(userLang, "admin_cuboid_info_name").replace("[0]", cuboid.getName()));
+					player.sendMessage(lang.getColoredMessage(userLang, "admin_cuboid_info_type").replace("[0]", CuboidType.getType(cuboid.getCuboidType()).name()));
+					player.sendMessage(lang.getColoredMessage(userLang, "admin_cuboid_info_owner").replace("[0]", cuboid.getOwner().getName()));
+					player.sendMessage(lang.getColoredMessage(userLang, "admin_cuboid_info_center").replace("[0]", cuboid.getCenter().getBlockX() + "")
 																							.replace("[1]", cuboid.getCenter().getBlockY() + "")
 																							.replace("[2]", cuboid.getCenter().getBlockZ() + ""));
-					player.sendMessage(lang.getColoredMessage(userLang, "cuboid_info_blocks").replace("[0]", cuboid.getArea() + "").replace("[1]", cuboid.getVolume() + ""));
-					player.sendMessage(lang.getColoredMessage(userLang, "cuboid_info_participants").replace("[0]", cuboid.getParticipants().size() + ""));
+					player.sendMessage(lang.getColoredMessage(userLang, "admin_cuboid_info_blocks").replace("[0]", cuboid.getArea() + "").replace("[1]", cuboid.getVolume() + ""));
+					player.sendMessage(lang.getColoredMessage(userLang, "admin_cuboid_info_participants").replace("[0]", cuboid.getParticipants().size() + ""));
 					
 				}
 			}

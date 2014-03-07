@@ -51,6 +51,11 @@ public class CCancelCommand extends AbstractCommand {
 		
 		String userLang = user.getLanguage();
 		
+		if (!Level.canUse(user, getLevel())) {
+			player.sendMessage(lang.getColoredMessage(userLang, "nopermission"));
+			return true;
+		}
+		
 		cuboidHandler.getCreatingPlayers().remove(player.getName());
 		cuboidHandler.getSearchingPlayers().remove(player.getName());
 		

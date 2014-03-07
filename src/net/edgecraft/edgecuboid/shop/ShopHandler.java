@@ -13,9 +13,10 @@ import net.edgecraft.edgecore.EdgeCoreAPI;
 import net.edgecraft.edgecore.db.DatabaseHandler;
 import net.edgecraft.edgecuboid.EdgeCuboid;
 import net.edgecraft.edgecuboid.cuboid.Cuboid;
-import net.edgecraft.edgecuboid.serializable.EdgeItemStack;
+import net.edgecraft.edgecuboid.other.EdgeItemStack;
 import net.edgecraft.edgecuboid.shop.Shop.ShopType;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 public class ShopHandler {
@@ -23,6 +24,8 @@ public class ShopHandler {
 	public static String shopTable = "edgecuboid_shops";
 	
 	private Map<Integer, Shop> shops = new LinkedHashMap<>();
+	private static List<Material> frames;
+	private static boolean looseInvOnDeath;
 	
 	private static final ShopHandler instance = new ShopHandler();
 	private final DatabaseHandler db = EdgeCoreAPI.databaseAPI();
@@ -67,6 +70,29 @@ public class ShopHandler {
 		}
 		
 		return providingShops;
+	}
+	
+	public List<Material> getShopFrames() {
+		return frames;
+	}
+	
+	public static void setShopFrames(List<String> frames) {
+		List<Material> material = new ArrayList<>();
+		
+		for (String s : frames) {
+			if (s != null)
+				material.add(Material.valueOf(s));
+		}
+		
+		ShopHandler.frames = material;
+	}
+	
+	public boolean getInventoryLoosing() {
+		return looseInvOnDeath;
+	}
+	
+	public static void toggleInventoryLoosing(boolean var) {
+		ShopHandler.looseInvOnDeath = var;
 	}
 	
 	public void registerShop(Cuboid c, ShopType type, String owner, double price, boolean buyable, double rental, boolean rentable, Map<EdgeItemStack, Double> guiItems, boolean distribution) {

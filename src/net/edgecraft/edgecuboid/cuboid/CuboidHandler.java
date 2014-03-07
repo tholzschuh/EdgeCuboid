@@ -186,11 +186,11 @@ public class CuboidHandler {
 	 * @throws Exception 
 	 */
 	public void registerCuboid(String name, int owner, CuboidType type, Level modifyLevel, Location min, Location max, String enterMsg, String leaveMsg, 
-			List<String> participants, HashMap<Flag, List<String>> flags, List<String> commands) throws Exception {
+			List<String> participants, List<CuboidEvent> events, HashMap<Flag, List<String>> flags, List<String> commands) throws Exception {
 		
 		if (existsCuboid(name)) return;
 		
-		Cuboid c = new Cuboid(name, generateID(), owner, type, modifyLevel, min, max, min.getWorld(), enterMsg, leaveMsg, participants, flags, commands);
+		Cuboid c = new Cuboid(name, generateID(), owner, type, modifyLevel, min, max, min.getWorld(), enterMsg, leaveMsg, participants, events, flags, commands);
 		registerCuboid(c);
 	}
 	
@@ -479,6 +479,22 @@ public class CuboidHandler {
 	public synchronized void synchronizeCuboid(int id) {
 		try {
 			
+			if (existsCuboid(id)) {
+				byte[] array = getCuboid(id).toByteArray();
+				
+				PreparedStatement sync = db.prepareUpdate("UPDATE " + CuboidHandler.cuboidTable + " SET id = ?, cuboid = ?");
+				Blob blob = new SerialBlob(array);
+				
+				sync.setInt(1, id);
+				sync.setBlob(2, blob);
+				sync.executeUpdate();
+				
+				Cuboid synced = Cuboid.toCuboid(getCuboid(id).toByteArray());
+				getCuboids().put(id, synced);
+				
+				return;
+			}
+			
 			List<Map<String, Object>> results = db.getResults("SELECT * FROM " + CuboidHandler.cuboidTable + " WHERE id = '" + id + "';");
 			
 			if (results.isEmpty()) {
@@ -488,26 +504,7 @@ public class CuboidHandler {
 			
 			byte[] byteToCuboid = (byte[]) results.get(0).get("cuboid");
 			
-			Cuboid cuboid = Cuboid.toCuboid(byteToCuboid);
-			
-			if (getCuboid(cuboid.getID()) != null) {
-				Cuboid c = getCuboid(cuboid.getID());			
-				
-				if (!c.equals(cuboid)) {
-					
-					PreparedStatement updateCuboid = db.prepareUpdate("UPDATE " + CuboidHandler.cuboidTable + " SET id = ?, cuboid = ?;");
-					Blob blob = new SerialBlob(c.toByteArray());
-					
-					updateCuboid.setInt(1, c.getID());	
-					updateCuboid.setBlob(2, blob);
-					updateCuboid.executeUpdate();
-					
-					getCuboids().put(c.getID(), c);
-				}
-				
-				return;
-			}
-			
+			Cuboid cuboid = Cuboid.toCuboid(byteToCuboid);			
 			getCuboids().put(cuboid.getID(), cuboid);
 			
 		} catch(Exception e) {
@@ -522,6 +519,22 @@ public class CuboidHandler {
 	public synchronized void synchronizeHabitat(int id) {
 		try {
 			
+			if (existsHabitat(id)) {
+				byte[] array = getHabitat(id).toByteArray();
+				
+				PreparedStatement sync = db.prepareUpdate("UPDATE " + CuboidHandler.habitatTable + " SET cuboidid = ?, habitat = ?;");
+				Blob blob = new SerialBlob(array);
+				
+				sync.setInt(1, id);
+				sync.setBlob(2, blob);
+				sync.executeUpdate();
+				
+				Habitat synced = Habitat.toHabitat(getHabitat(id).toByteArray());
+				getHabitats().put(id, synced);
+				
+				return;
+			}
+			
 			List<Map<String, Object>> results = db.getResults("SELECT * FROM " + CuboidHandler.habitatTable + " WHERE cuboidid = '" + id + "';");
 			
 			if (results.isEmpty()) {
@@ -531,26 +544,7 @@ public class CuboidHandler {
 			
 			byte[] byteToHabitat = (byte[]) results.get(0).get("habitat");
 			
-			Habitat habitat = Habitat.toHabitat(byteToHabitat);
-			
-			if (getHabitat(habitat.getCuboidID()) != null) {
-				Habitat h = habitat;
-				
-				if (!h.equals(habitat)) {
-					
-					PreparedStatement updateHabitat = db.prepareUpdate("UPDATE " + CuboidHandler.habitatTable + " SET cuboidid = ?, habitat = ?;");
-					Blob blob = new SerialBlob(h.toByteArray());
-					
-					updateHabitat.setInt(1, h.getCuboidID());	
-					updateHabitat.setBlob(2, blob);
-					updateHabitat.executeUpdate();
-					
-					getHabitats().put(h.getCuboidID(), h);
-				}
-				
-				return;
-			}
-			
+			Habitat habitat = Habitat.toHabitat(byteToHabitat);			
 			getHabitats().put(habitat.getCuboidID(), habitat);
 			
 		} catch(Exception e) {

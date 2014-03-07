@@ -1,32 +1,39 @@
 package net.edgecraft.edgecuboid.cuboid;
 
-public class Upgrade {
+import java.io.Serializable;
+
+public class Upgrade implements Serializable {
 	
-	public enum UpgradeType {
+	private static final long serialVersionUID = 1L;
+
+	public enum UpgradeType implements Serializable {
 	
-		FULL_INSURANCE(0, "Full Insurance", false),
-		FIRE_INSURANCE(1, "Fire Insurance", false),
-		WATER_INSURANCE(2, "Water Insurance", false),
-		THIEF_INSURANCE(3, "Thief Insurance", false),
+		FULL_INSURANCE(0, "Full Insurance", false, 13500, 4000),
+		FIRE_INSURANCE(1, "Fire Insurance", false, 5000, 1500),
+		WATER_INSURANCE(2, "Water Insurance", false, 5000, 1500),
+		THIEF_INSURANCE(3, "Thief Insurance", false, 5000, 1500),
 		
-		ELECTRICITY_LIMITED(4, "Limited Electricity", false),
-		ELECTRICITY_EXTENDED(5, "Extended Electricity", false),
-		ELECTRICITY_UNLIMITED(6, "Unlimited Electricity", false),
+		ELECTRICITY_LIMITED(4, "Limited Electricity", false, 2000, 450),
+		ELECTRICITY_EXTENDED(5, "Extended Electricity", false, 3500, 650),
+		ELECTRICITY_UNLIMITED(6, "Unlimited Electricity", false, 6500, 800),
 		
-		PROTECTION(7, "Protection", false),
-		PROTECTION_REINFORCED(8, "Reinforced Protection", false),
-		PROTECTION_ULTIMATE(9, "Ultimate Protection", false),
+		PROTECTION(7, "Protection", false, 500, 50),
+		PROTECTION_REINFORCED(8, "Reinforced Protection", false, 1250, 120),
+		PROTECTION_ULTIMATE(9, "Ultimate Protection", false, 3450, 320),
 		
-		EXPANSION(10, "Expansion", true);
+		EXPANSION(10, "Expansion", true, 1000, 5);
 		
 		private int id;
 		private String name;
 		private boolean multiple;
+		private double price;
+		private double monthlyPrice;
 		
-		private UpgradeType(int id, String name, boolean multiple) {
+		private UpgradeType(int id, String name, boolean multiple, double price, double monthlyPrice) {
 			this.id = id;
 			this.name = name;
 			this.multiple = multiple;
+			this.price = price;
 		}
 		
 		public int getID() {
@@ -40,6 +47,14 @@ public class Upgrade {
 		public boolean isMultiple() {
 			return multiple;
 		}
+		
+		public double getPrice() {
+			return price;
+		}
+		
+		public double getMonthlyPrice() {
+			return monthlyPrice;
+		}
 	}
 	
 	private UpgradeType type;
@@ -48,10 +63,16 @@ public class Upgrade {
 	
 	protected Upgrade() { /* ... */ }
 	
-	public Upgrade(UpgradeType type, double price, double monthlyPrice) {
+	public Upgrade(UpgradeType type, double monthlyPrice) {
 		setType(type);
-		setPrice(price);
+		setPrice(type.getPrice());
 		setMonthlyPrice(monthlyPrice);
+	}
+	
+	public Upgrade(UpgradeType type) {
+		setType(type);
+		setPrice(type.getPrice());
+		setMonthlyPrice(type.getMonthlyPrice());
 	}
 	
 	public UpgradeType getType() {

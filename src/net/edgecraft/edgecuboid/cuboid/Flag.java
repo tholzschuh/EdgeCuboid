@@ -1,10 +1,12 @@
 package net.edgecraft.edgecuboid.cuboid;
 
+import java.io.Serializable;
+
 import net.edgecraft.edgecore.EdgeCoreAPI;
 import net.edgecraft.edgecore.command.Level;
 import net.edgecraft.edgecore.user.User;
 
-public enum Flag {
+public enum Flag implements Serializable {
 	
 	BreakBlocks(0),
 	PlaceBlocks(1),

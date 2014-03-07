@@ -22,7 +22,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.entity.Player;
 
 public class Cuboid implements Serializable {
 	
@@ -54,7 +53,7 @@ public class Cuboid implements Serializable {
 	
 	protected Cuboid(String name, int id, int ownerID, CuboidType cuboidType, Level modifyLevel,
 					Location minLocation, Location maxLocation, World world, String enterMessage, String leaveMessage,
-					List<String> participants, HashMap<Flag, List<String>> flags, List<String> commands) {
+					List<String> participants, List<CuboidEvent> events, HashMap<Flag, List<String>> flags, List<String> commands) {
 		
 		setName(name);
 		setID(id);
@@ -63,11 +62,12 @@ public class Cuboid implements Serializable {
 		setModifyLevel(null);
 		setMinLocation(minLocation);
 		setMaxLocation(maxLocation);
-		setWorld(world.getName());
+		setWorld(world);
 		setEnterMessage(enterMessage);
 		setLeaveMessage(leaveMessage);
 		setParticipants(participants);
-		setEvents(cuboidType.getEventList());
+		setEvents(events);
+		getEvents().addAll(cuboidType.getEventList());
 		setFlags(flags);
 		setCommands(commands);
 		
@@ -135,7 +135,7 @@ public class Cuboid implements Serializable {
 		infoMap.put("owner-id", ownerID);
 		infoMap.put("cuboid-type", getCuboidType());
 		infoMap.put("modifylevel", getModifyLevel().value());
-
+		
 		// Put location information
 		infoMap.put("minlocation-x", getMinLocation().getBlockX());
 		infoMap.put("minlocation-y", getMinLocation().getBlockY());
@@ -144,11 +144,12 @@ public class Cuboid implements Serializable {
 		infoMap.put("maxlocation-y", getMaxLocation().getBlockY());
 		infoMap.put("maxlocation-z", getMaxLocation().getBlockZ());
 		infoMap.put("world", world);
-
+		
 		// Put cuboid specific information
 		infoMap.put("participants", participants);
 		infoMap.put("entermessage", enterMessage);
 		infoMap.put("leavemessage", leaveMessage);
+		
 		infoMap.put("events", events);
 		infoMap.put("flags", flags);
 		infoMap.put("commands", commands);
@@ -178,7 +179,7 @@ public class Cuboid implements Serializable {
 		setMaxLocation(max);
 		setWorld((World) Bukkit.getWorld((String) infoMap.get("world")));
 
-		setParticipants((List<String>) infoMap.get("participants"));
+		setParticipants((List<String>) infoMap.get("participants"));		
 		setEvents((List<CuboidEvent>) infoMap.get("events"));
 		setFlags((HashMap<Flag, List<String>>) infoMap.get("flags"));
 		setCommands((List<String>) infoMap.get("commands"));
@@ -415,27 +416,34 @@ public class Cuboid implements Serializable {
 	 * @return true/false
 	 */
 	public boolean isInside(Location loc) {
-	    if (loc.getWorld() != getWorldInstance()) return false;
-
-	    if ((loc.getBlockX() >= getMinLocation().getBlockX()) && (loc.getBlockX() <= getMaxLocation().getBlockX()) && 
-	    	(loc.getBlockY() >= getMinLocation().getBlockY()) && (loc.getBlockY() <= getMaxLocation().getBlockY()) && 
-	    	(loc.getBlockZ() >= getMinLocation().getBlockZ()) && (loc.getBlockZ() <= getMaxLocation().getBlockZ())) {
-	    	
-	      return true;
-	    }
-
-	    return false;
+		if (!loc.getWorld().getName().equals(getWorld())) return false;
+		
+		int minX = Math.min(minLocation.getBlockX(), maxLocation.getBlockX());
+		int minY = Math.min(minLocation.getBlockY(), maxLocation.getBlockY());
+		int minZ = Math.min(minLocation.getBlockZ(), maxLocation.getBlockZ());
+		int maxX = Math.max(minLocation.getBlockX(), maxLocation.getBlockX());
+		int maxY = Math.max(minLocation.getBlockY(), maxLocation.getBlockY());
+		int maxZ = Math.max(minLocation.getBlockZ(), maxLocation.getBlockZ());
+		
+		if ((loc.getBlockX() >= minX) && (loc.getBlockX() <= maxX)
+			&& (loc.getBlockY() >= minY) && (loc.getBlockY() <= maxY)
+			&& (loc.getBlockZ() >= minZ) && (loc.getBlockZ() <= maxZ)) {
+			
+			return true;
+		}
+		
+		return false;
 	}
-	
+
 	/**
 	 * Returns the cuboid the given player is currently in
 	 * @param p
 	 * @return Cuboid
 	 */
-	public static Cuboid getCuboid(Player p) {
-		
+	public static Cuboid getCuboid(Location loc) {		
 		for (Cuboid c : CuboidHandler.getInstance().getCuboids().values()) {
-			if (c.isInside(p.getLocation())) {
+			
+			if (c.isInside(loc)) {
 				return c;
 			}
 		}
@@ -624,7 +632,7 @@ public class Cuboid implements Serializable {
 	 */
 	protected void setModifyLevel(Level level) {
 		if (level == null)
-			this.modifyLevel = getOwner().getLevel();
+			this.modifyLevel = Level.USER;
 		else
 			this.modifyLevel = level;
 	}
@@ -645,7 +653,10 @@ public class Cuboid implements Serializable {
 	 * @param events
 	 */
 	protected void setEvents(List<CuboidEvent> events) {
-		this.events = events;
+		if (events == null)
+			this.events = new ArrayList<CuboidEvent>();
+		else
+			this.events = events;
 	}
 	
 	/**
@@ -728,15 +739,6 @@ public class Cuboid implements Serializable {
 	protected void setWorld(World w) {
 		if (w != null)
 			this.world = w.getName();
-	}
-	
-	/**
-	 * Sets the cuboids' world
-	 * @param world
-	 */
-	protected void setWorld(String world) {
-		if (world != null)
-			this.world = world;
 	}
 
 	/**

@@ -64,6 +64,11 @@ public class CuboidCommand extends AbstractCommand {
 		
 		String userLang = user.getLanguage();
 		
+		if (!Level.canUse(user, getLevel())) {
+			player.sendMessage(lang.getColoredMessage(userLang, "nopermission"));
+			return true;
+		}
+		
 		if (args[1].equalsIgnoreCase("create")) {
 			if (args.length != 4) {
 				sendUsage(player);
@@ -88,7 +93,7 @@ public class CuboidCommand extends AbstractCommand {
 			c.setName(name);
 			c.switchOwner(user.getID());
 			c.updateCuboidType(type);
-			c.updateModifyLevel(user.getLevel());
+			c.updateModifyLevel(Level.USER);
 			
 			cuboidHandler.getCreatingPlayers().put(player.getName(), c);				
 			player.sendMessage(lang.getColoredMessage(userLang, "admin_cuboid_create_start").replace("[0]", WorldManager.getInstance().getCreationItem().name().toLowerCase()));
