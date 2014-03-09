@@ -95,9 +95,7 @@ public class ShopHandler {
 		ShopHandler.looseInvOnDeath = var;
 	}
 	
-	public void registerShop(Cuboid c, ShopType type, String owner, double price, boolean buyable, double rental, boolean rentable, Map<EdgeItemStack, Double> guiItems, boolean distribution) {
-		if (existsShop(c.getID()) || existsShop(c.getName()) || getShop(owner) != null) return;
-		
+	public void registerShop(Cuboid c, ShopType type, String owner, double price, boolean buyable, double rental, boolean rentable, Map<EdgeItemStack, Double> guiItems, boolean distribution) {		
 		try {
 			
 			Shop shop = new Shop(c, type, owner, price, buyable, rental, rentable, guiItems, distribution);

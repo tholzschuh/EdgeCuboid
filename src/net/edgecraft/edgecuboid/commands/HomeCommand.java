@@ -23,6 +23,14 @@ public class HomeCommand extends AbstractCommand {
 	
 	private final CuboidHandler cuboidHandler = EdgeCuboidAPI.cuboidAPI();
 	
+	private static final HomeCommand instance = new HomeCommand();
+	
+	private HomeCommand() { super(); }
+	
+	public static final HomeCommand getInstance() {
+		return instance;
+	}
+	
 	@Override
 	public Level getLevel() {
 		return Level.valueOf(EdgeCuboid.getInstance().getConfig().getString("Command.home"));
@@ -38,11 +46,6 @@ public class HomeCommand extends AbstractCommand {
 	public boolean runImpl(Player player, User user, String[] args) throws Exception {
 		
 		String userLang = user.getLanguage();
-		
-		if (!Level.canUse(user, getLevel())) {
-			player.sendMessage(lang.getColoredMessage(userLang, "nopermission"));
-			return true;
-		}
 		
 		try {
 			
@@ -393,26 +396,20 @@ public class HomeCommand extends AbstractCommand {
 	}
 
 	@Override
-	public void sendUsage(CommandSender sender) {	
-		if (sender instanceof Player) {
-			
-			User u = EdgeCoreAPI.userAPI().getUser(sender.getName());
-			
-			if (u != null) {
-				
-				if (!Level.canUse(u, getLevel())) return;
-				
-				sender.sendMessage(EdgeCore.usageColor + "/home buy <habitat>");
-				sender.sendMessage(EdgeCore.usageColor + "/home sell <price> [<habitat>]");
-				sender.sendMessage(EdgeCore.usageColor + "/home lease <habitat>");
-				sender.sendMessage(EdgeCore.usageColor + "/home rent <rental> [<habitat>]");
-				sender.sendMessage(EdgeCore.usageColor + "/home info [<habitat>]");
-				
-				if (!Level.canUse(u, Level.ARCHITECT)) return;
-				sender.sendMessage(EdgeCore.usageColor + "/home upgrade");
-				
-			}
-		}
+	public void sendUsageImpl(CommandSender sender) {
+		if (!(sender instanceof Player)) return;
+		
+		sender.sendMessage(EdgeCore.usageColor + "/home buy <habitat>");
+		sender.sendMessage(EdgeCore.usageColor + "/home sell <price> [<habitat>]");
+		sender.sendMessage(EdgeCore.usageColor + "/home lease <habitat>");
+		sender.sendMessage(EdgeCore.usageColor + "/home rent <rental> [<habitat>]");
+		sender.sendMessage(EdgeCore.usageColor + "/home info [<habitat>]");
+		
+		User u = EdgeCoreAPI.userAPI().getUser(sender.getName());
+		
+		if (u == null || !Level.canUse(u, Level.ARCHITECT)) return;
+		
+		sender.sendMessage(EdgeCore.usageColor + "/home upgrade");
 	}
 
 	@Override

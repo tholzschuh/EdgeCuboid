@@ -30,7 +30,7 @@ public class HandleCommandEvents implements Listener {
 			
 			try {
 				
-				if (user != null && CuboidHandler.getInstance().isCreating(player.getName())) {
+				if (user != null && CuboidHandler.getInstance().isCreating(player.getName()) && event.getItem() != null) {
 					
 					Material material = event.getItem().getType();
 					
@@ -38,8 +38,30 @@ public class HandleCommandEvents implements Listener {
 						
 						Cuboid creation = CuboidHandler.getInstance().getCreatingPlayers().get(player.getName());
 						
+						Location spawn = creation.getSpawn();
 						Location minLoc = creation.getMinLocation();
 						Location maxLoc = creation.getMaxLocation();
+						
+						if (minLoc != null && maxLoc != null) {
+							
+							event.setCancelled(true);
+							
+							spawn = event.getClickedBlock().getLocation().clone();
+							String x = maxLoc.getBlockX() + "";
+							String y = maxLoc.getBlockY() + "";
+							String z = maxLoc.getBlockZ() + "";
+							
+							creation.updateSpawn(spawn);
+							player.sendMessage(lang.getColoredMessage(user.getLanguage(), "cuboid_creation_point").replace("[0]", "Spawn").replace("[1]", x).replace("[2]", y).replace("[3]", z));
+							
+							CuboidHandler.getInstance().registerCuboid(creation.getName(), creation.getOwnerID(), 
+									CuboidType.getType(creation.getCuboidType()), creation.getModifyLevel(), creation.getSpawn(), creation.getMinLocation(), 
+									creation.getMaxLocation(), "", "", null, null, null, null);
+
+							CuboidHandler.getInstance().getCreatingPlayers().remove(player.getName());
+
+							player.sendMessage(lang.getColoredMessage(user.getLanguage(), "cuboid_creation_success").replace("[0]", creation.getName()));
+						}
 						
 						if (minLoc != null && maxLoc == null) {
 							
@@ -53,13 +75,6 @@ public class HandleCommandEvents implements Listener {
 							creation.updateMaxLocation(maxLoc);
 							player.sendMessage(lang.getColoredMessage(user.getLanguage(), "cuboid_creation_point").replace("[0]", "2").replace("[1]", x).replace("[2]", y).replace("[3]", z));
 							
-							CuboidHandler.getInstance().registerCuboid(creation.getName(), creation.getOwnerID(), 
-																CuboidType.getType(creation.getCuboidType()), creation.getModifyLevel(), creation.getMinLocation(), 
-																creation.getMaxLocation(), "", "", null, null, null, null);
-							
-							CuboidHandler.getInstance().getCreatingPlayers().remove(player.getName());
-							
-							player.sendMessage(lang.getColoredMessage(user.getLanguage(), "cuboid_creation_success").replace("[0]", creation.getName()));
 						}
 						
 						if (minLoc == null && maxLoc == null) {
@@ -93,7 +108,7 @@ public class HandleCommandEvents implements Listener {
 			Player player = event.getPlayer();
 			User user = EdgeCoreAPI.userAPI().getUser(player.getName());
 			
-			if (user != null && CuboidHandler.getInstance().isSearching(player.getName())) {
+			if (user != null && CuboidHandler.getInstance().isSearching(player.getName()) && event.getItem() != null) {
 				
 				Material material = event.getItem().getType();
 				String userLang = user.getLanguage();

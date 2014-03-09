@@ -51,6 +51,32 @@ public class CuboidHandler {
 	}
 	
 	/**
+	 * Returns the nearest cuboid to the given location of the given type
+	 * @param type
+	 * @param loc
+	 * @return Cuboid
+	 */
+	public Cuboid getNearestCuboid(CuboidType type, Location loc) {
+		double nearest = 0;
+		Cuboid cuboid = null;
+		
+		for (Cuboid c : cuboids.values()) {
+			if (c.getCuboidType() != type.getTypeID()) continue;
+			if (nearest == 0) {
+				nearest = loc.distanceSquared(c.getCenter());
+				cuboid = c;
+			}
+			
+			if (loc.distanceSquared(c.getCenter()) < nearest) {
+				nearest = loc.distanceSquared(c.getCenter());
+				cuboid = c;
+			}
+		}
+		
+		return cuboid;
+	}
+	
+	/**
 	 * Returns a HashMap containing all stored habitats
 	 * @return HashMap<Integer, Habitat>
 	 */
@@ -185,12 +211,12 @@ public class CuboidHandler {
 	 * @param flags
 	 * @throws Exception 
 	 */
-	public void registerCuboid(String name, int owner, CuboidType type, Level modifyLevel, Location min, Location max, String enterMsg, String leaveMsg, 
+	public void registerCuboid(String name, int owner, CuboidType type, Level modifyLevel, Location spawn, Location min, Location max, String enterMsg, String leaveMsg, 
 			List<String> participants, List<CuboidEvent> events, HashMap<Flag, List<String>> flags, List<String> commands) throws Exception {
 		
 		if (existsCuboid(name)) return;
 		
-		Cuboid c = new Cuboid(name, generateID(), owner, type, modifyLevel, min, max, min.getWorld(), enterMsg, leaveMsg, participants, events, flags, commands);
+		Cuboid c = new Cuboid(name, generateID(), owner, type, modifyLevel, spawn, min, max, min.getWorld(), enterMsg, leaveMsg, participants, events, flags, commands);
 		registerCuboid(c);
 	}
 	
@@ -198,7 +224,7 @@ public class CuboidHandler {
 		try {
 			
 			byte[] cuboidByteArray = cuboid.toByteArray();
-			System.out.println(cuboid + " - " + cuboidByteArray);
+			
 			Blob blob = null;
 			blob = new SerialBlob(cuboidByteArray);
 			
@@ -276,7 +302,7 @@ public class CuboidHandler {
 		
 		try {
 		 	
-			PreparedStatement deleteHabitat = db.prepareUpdate("DELETE FROM " + CuboidHandler.habitatTable + " WHERE id = '" + id + "';");
+			PreparedStatement deleteHabitat = db.prepareUpdate("DELETE FROM " + CuboidHandler.habitatTable + " WHERE cuboidid = '" + id + "';");
 			deleteHabitat.executeUpdate();
 			
 			getHabitats().remove(id);
@@ -480,13 +506,13 @@ public class CuboidHandler {
 		try {
 			
 			if (existsCuboid(id)) {
+				
 				byte[] array = getCuboid(id).toByteArray();
 				
-				PreparedStatement sync = db.prepareUpdate("UPDATE " + CuboidHandler.cuboidTable + " SET id = ?, cuboid = ?");
+				PreparedStatement sync = db.prepareUpdate("UPDATE " + CuboidHandler.cuboidTable + " SET cuboid = ? WHERE id = '" + id + "';");
 				Blob blob = new SerialBlob(array);
 				
-				sync.setInt(1, id);
-				sync.setBlob(2, blob);
+				sync.setBlob(1, blob);
 				sync.executeUpdate();
 				
 				Cuboid synced = Cuboid.toCuboid(getCuboid(id).toByteArray());
@@ -522,11 +548,10 @@ public class CuboidHandler {
 			if (existsHabitat(id)) {
 				byte[] array = getHabitat(id).toByteArray();
 				
-				PreparedStatement sync = db.prepareUpdate("UPDATE " + CuboidHandler.habitatTable + " SET cuboidid = ?, habitat = ?;");
+				PreparedStatement sync = db.prepareUpdate("UPDATE " + CuboidHandler.habitatTable + " SET habitat = ? WHERE cuboidid = '" + id + "';");
 				Blob blob = new SerialBlob(array);
 				
-				sync.setInt(1, id);
-				sync.setBlob(2, blob);
+				sync.setBlob(1, blob);
 				sync.executeUpdate();
 				
 				Habitat synced = Habitat.toHabitat(getHabitat(id).toByteArray());

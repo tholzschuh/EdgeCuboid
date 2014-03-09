@@ -1,7 +1,6 @@
 package net.edgecraft.edgecuboid.commands;
 
 import net.edgecraft.edgecore.EdgeCore;
-import net.edgecraft.edgecore.EdgeCoreAPI;
 import net.edgecraft.edgecore.command.AbstractCommand;
 import net.edgecraft.edgecore.command.Level;
 import net.edgecraft.edgecore.user.User;
@@ -14,6 +13,14 @@ import org.bukkit.entity.Player;
 public class CCancelCommand extends AbstractCommand {
 	
 	private final CuboidHandler cuboidHandler = CuboidHandler.getInstance();
+	
+	private static final CCancelCommand instance = new CCancelCommand();
+	
+	private CCancelCommand() { super(); }
+	
+	public static final CCancelCommand getInstance() {
+		return instance;
+	}
 	
 	@Override
 	public Level getLevel() {
@@ -32,29 +39,16 @@ public class CCancelCommand extends AbstractCommand {
 	}
 	
 	@Override
-	public  void sendUsage(CommandSender sender) {
-		if (sender instanceof Player) {
-			
-			User u = EdgeCoreAPI.userAPI().getUser(sender.getName());
-			
-			if (u != null) {
-				
-				if (!Level.canUse(u, getLevel())) return;
-				
-				sender.sendMessage(EdgeCore.usageColor + "/ccancel");
-			}
-		}
+	public  void sendUsageImpl(CommandSender sender) {
+		if (!(sender instanceof Player)) return;
+		
+		sender.sendMessage(EdgeCore.usageColor + "/ccancel");
 	}
 	
 	@Override
 	public boolean runImpl(Player player, User user, String[] args) throws Exception {
 		
 		String userLang = user.getLanguage();
-		
-		if (!Level.canUse(user, getLevel())) {
-			player.sendMessage(lang.getColoredMessage(userLang, "nopermission"));
-			return true;
-		}
 		
 		cuboidHandler.getCreatingPlayers().remove(player.getName());
 		cuboidHandler.getSearchingPlayers().remove(player.getName());

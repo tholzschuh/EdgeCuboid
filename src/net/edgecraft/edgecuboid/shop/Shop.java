@@ -324,104 +324,128 @@ public class Shop implements Serializable {
 			p.closeInventory();
 	}
 	
-	public synchronized void buyItem(EconomyPlayer ep, EdgeItemStack guiItem) throws Exception {
-		if (!getGuiItems().containsKey(guiItem)) return;
-		if (getItemPrice(guiItem) > ep.getCash()) {
-			ep.getUser().getPlayer().sendMessage(lang.getColoredMessage(ep.getUser().getLanguage(), "notenoughmoney"));
-			return;
+	public synchronized void buyItem(EconomyPlayer ep, EdgeItemStack guiItem) {
+		try {
+			
+			if (!getGuiItems().containsKey(guiItem)) return;
+			if (getItemPrice(guiItem) > ep.getCash()) {
+				ep.getUser().getPlayer().sendMessage(lang.getColoredMessage(ep.getUser().getLanguage(), "notenoughmoney"));
+				return;
+			}
+			
+			Player player = ep.getUser().getPlayer();
+			BankAccount shop = Economy.getInstance().getAccount(getOwner());
+			
+			ep.updateCash(ep.getCash() - getItemPrice(guiItem));
+			shop.updateBalance(shop.getBalance() + getItemPrice(guiItem));
+			
+			player.getInventory().addItem(new ItemStack(guiItem.toBukkitItemStack()));
+			
+			player.sendMessage(lang.getColoredMessage(ep.getUser().getLanguage(), "shop_buyitem_success").replace("[0]", guiItem.getType().name()).replace("[1]", getItemPrice(guiItem) + ""));
+			
+		} catch(Exception e) {
+			e.printStackTrace();
 		}
-		
-		Player player = ep.getUser().getPlayer();
-		BankAccount shop = Economy.getInstance().getAccount(getOwner());
-		
-		ep.updateCash(ep.getCash() - getItemPrice(guiItem));
-		shop.updateBalance(shop.getBalance() + getItemPrice(guiItem));
-		
-		player.getInventory().addItem(new ItemStack(guiItem.toBukkitItemStack()));
-		
-		player.sendMessage(lang.getColoredMessage(ep.getUser().getLanguage(), "shop_buyitem_success").replace("[0]", guiItem.getType().name()).replace("[1]", getItemPrice(guiItem) + ""));
 	}
 	
-	public synchronized void buyItem(BankAccount acc, EdgeItemStack guiItem) throws Exception {
-		if (!getGuiItems().containsKey(guiItem)) return;
-		if (getItemPrice(guiItem) > acc.getBalance()) {
-			acc.getUser().getPlayer().sendMessage(lang.getColoredMessage(acc.getUser().getLanguage(), "notenoughmoney"));
-			return;
+	public synchronized void buyItem(BankAccount acc, EdgeItemStack guiItem) {
+		try {
+			
+			if (!getGuiItems().containsKey(guiItem)) return;
+			if (getItemPrice(guiItem) > acc.getBalance()) {
+				acc.getUser().getPlayer().sendMessage(lang.getColoredMessage(acc.getUser().getLanguage(), "notenoughmoney"));
+				return;
+			}
+			
+			Player player = acc.getUser().getPlayer();
+			BankAccount shop = Economy.getInstance().getAccount(getOwner());
+			
+			acc.updateBalance(acc.getBalance() - getItemPrice(guiItem));
+			shop.updateBalance(shop.getBalance() + getItemPrice(guiItem));
+			
+			EdgeConomyAPI.transactionAPI().addTransaction(shop, acc, getItemPrice(guiItem), "Shop Transaction");
+			
+			player.getInventory().addItem(new ItemStack(guiItem.toBukkitItemStack()));
+			
+			player.sendMessage(lang.getColoredMessage(acc.getUser().getLanguage(), "shop_buyitem_success").replace("[0]", guiItem.getType().name()).replace("[1]", getItemPrice(guiItem) + ""));
+			
+		} catch(Exception e) {
+			e.printStackTrace();
 		}
-		
-		Player player = acc.getUser().getPlayer();
-		BankAccount shop = Economy.getInstance().getAccount(getOwner());
-		
-		acc.updateBalance(acc.getBalance() - getItemPrice(guiItem));
-		shop.updateBalance(shop.getBalance() + getItemPrice(guiItem));
-		
-		EdgeConomyAPI.transactionAPI().addTransaction(shop, acc, getItemPrice(guiItem), "Shop Transaction");
-		
-		player.getInventory().addItem(new ItemStack(guiItem.toBukkitItemStack()));
-		
-		player.sendMessage(lang.getColoredMessage(acc.getUser().getLanguage(), "shop_buyitem_success").replace("[0]", guiItem.getType().name()).replace("[1]", getItemPrice(guiItem) + ""));
 	}
 	
-	public synchronized void sellItem(EconomyPlayer ep, EdgeItemStack guiItem) throws Exception {
-		if (!getGuiItems().containsKey(guiItem)) return;
-		if (!isDistributionAllowed()) return;
-		
-		Player player = ep.getUser().getPlayer();
-		
-		if (getItemPrice(guiItem) > ep.getCash()) {
-			player.sendMessage(lang.getColoredMessage(ep.getUser().getLanguage(), "notenoughmoney"));
-			return;
+	public synchronized void sellItem(EconomyPlayer ep, EdgeItemStack guiItem) {
+		try {
+			
+			if (!getGuiItems().containsKey(guiItem)) return;
+			if (!isDistributionAllowed()) return;
+			
+			Player player = ep.getUser().getPlayer();
+			
+			if (getItemPrice(guiItem) > ep.getCash()) {
+				player.sendMessage(lang.getColoredMessage(ep.getUser().getLanguage(), "notenoughmoney"));
+				return;
+			}
+			
+			if (!player.getItemInHand().getType().equals(guiItem.getType())) {
+				player.sendMessage(lang.getColoredMessage(ep.getUser().getLanguage(), "shop_sellitem_wrongitem"));
+				return;
+			}
+			
+			BankAccount shop = Economy.getInstance().getAccount(getOwner());
+			
+			if (!player.getInventory().contains(guiItem.getType())) {
+				player.sendMessage(lang.getColoredMessage(ep.getUser().getLanguage(), "shop_sellitem_noitem"));
+				return;
+			}
+			
+			ep.updateCash(ep.getCash() + getItemPrice(guiItem));
+			shop.updateBalance(shop.getBalance() - getItemPrice(guiItem));
+			
+			player.getItemInHand().setAmount(player.getItemInHand().getAmount() - 1);
+			
+			player.sendMessage(lang.getColoredMessage(ep.getUser().getLanguage(), "shop_sellitem_success").replace("[0]", guiItem.getType().name()).replace("[1]", getItemPrice(guiItem) + ""));
+			
+		} catch(Exception e) {
+			e.printStackTrace();
 		}
-		
-		if (!player.getItemInHand().getType().equals(guiItem.getType())) {
-			player.sendMessage(lang.getColoredMessage(ep.getUser().getLanguage(), "shop_sellitem_wrongitem"));
-			return;
-		}
-		
-		BankAccount shop = Economy.getInstance().getAccount(getOwner());
-		
-		if (!player.getInventory().contains(guiItem.getType())) {
-			player.sendMessage(lang.getColoredMessage(ep.getUser().getLanguage(), "shop_sellitem_noitem"));
-			return;
-		}
-		
-		ep.updateCash(ep.getCash() + getItemPrice(guiItem));
-		shop.updateBalance(shop.getBalance() - getItemPrice(guiItem));
-		
-		player.getItemInHand().setAmount(player.getItemInHand().getAmount() - 1);
-		
-		player.sendMessage(lang.getColoredMessage(ep.getUser().getLanguage(), "shop_sellitem_success").replace("[0]", guiItem.getType().name()).replace("[1]", getItemPrice(guiItem) + ""));
 	}
 	
-	public synchronized void sellItem(BankAccount acc, EdgeItemStack guiItem) throws Exception {
-		if (!getGuiItems().containsKey(guiItem)) return;
-		if (!isDistributionAllowed()) return;
-		
-		Player player = acc.getUser().getPlayer();
-		
-		if (getItemPrice(guiItem) > acc.getBalance()) {
-			player.sendMessage(lang.getColoredMessage(acc.getUser().getLanguage(), "notenoughmoney"));
-			return;
+	public synchronized void sellItem(BankAccount acc, EdgeItemStack guiItem) {
+		try {
+			
+			if (!getGuiItems().containsKey(guiItem)) return;
+			if (!isDistributionAllowed()) return;
+			
+			Player player = acc.getUser().getPlayer();
+			
+			if (getItemPrice(guiItem) > acc.getBalance()) {
+				player.sendMessage(lang.getColoredMessage(acc.getUser().getLanguage(), "notenoughmoney"));
+				return;
+			}
+			
+			if (!player.getItemInHand().getType().equals(guiItem.getType())) {
+				player.sendMessage(lang.getColoredMessage(acc.getUser().getLanguage(), "shop_sellitem_wrongitem"));
+				return;
+			}
+			
+			BankAccount shop = Economy.getInstance().getAccount(getOwner());
+			
+			if (!player.getInventory().contains(guiItem.getType())) {
+				player.sendMessage(lang.getColoredMessage(acc.getUser().getLanguage(), "shop_sellitem_noitem"));
+				return;
+			}
+			
+			acc.updateBalance(acc.getBalance() + getItemPrice(guiItem));
+			shop.updateBalance(shop.getBalance() - getItemPrice(guiItem));
+			
+			player.getItemInHand().setAmount(player.getItemInHand().getAmount() - 1);
+			
+			player.sendMessage(lang.getColoredMessage(acc.getUser().getLanguage(), "shop_sellitem_success").replace("[0]", guiItem.getType().name()).replace("[1]", getItemPrice(guiItem) + ""));
+			
+		} catch(Exception e) {
+			e.printStackTrace();
 		}
-		
-		if (!player.getItemInHand().getType().equals(guiItem.getType())) {
-			player.sendMessage(lang.getColoredMessage(acc.getUser().getLanguage(), "shop_sellitem_wrongitem"));
-			return;
-		}
-		
-		BankAccount shop = Economy.getInstance().getAccount(getOwner());
-		
-		if (!player.getInventory().contains(guiItem.getType())) {
-			player.sendMessage(lang.getColoredMessage(acc.getUser().getLanguage(), "shop_sellitem_noitem"));
-			return;
-		}
-		
-		acc.updateBalance(acc.getBalance() + getItemPrice(guiItem));
-		shop.updateBalance(shop.getBalance() - getItemPrice(guiItem));
-		
-		player.getItemInHand().setAmount(player.getItemInHand().getAmount() - 1);
-		
-		player.sendMessage(lang.getColoredMessage(acc.getUser().getLanguage(), "shop_sellitem_success").replace("[0]", guiItem.getType().name()).replace("[1]", getItemPrice(guiItem) + ""));
 	}
 	
 	protected void setupShopGui() {
@@ -458,7 +482,7 @@ public class Shop implements Serializable {
 		ItemStack[] content = new ItemStack[tempContent.size()];
 		content = tempContent.toArray(content);
 		
-		inv = Bukkit.createInventory(null, invSize, "Shop-GUI_beta");
+		inv = Bukkit.createInventory(null, invSize, "BETA_ShopGUI - " + getCuboid().getName());
 		inv.setContents(content);
 		
 		this.gui = inv;

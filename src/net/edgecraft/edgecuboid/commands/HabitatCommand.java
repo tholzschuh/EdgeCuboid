@@ -21,6 +21,14 @@ public class HabitatCommand extends AbstractCommand {
 	
 	private final CuboidHandler cuboidHandler = CuboidHandler.getInstance();
 	
+	private static final HabitatCommand instance = new HabitatCommand();
+	
+	private HabitatCommand() { super(); }
+	
+	public static final HabitatCommand getInstance() {
+		return instance;
+	}
+	
 	@Override
 	public Level getLevel() {
 		return Level.valueOf(EdgeCuboid.getInstance().getConfig().getString("Command.habitat"));
@@ -38,27 +46,18 @@ public class HabitatCommand extends AbstractCommand {
 	}
 	
 	@Override
-	public void sendUsage(CommandSender sender) {
-		if (sender instanceof Player) {
-			
-			User u = EdgeCoreAPI.userAPI().getUser(sender.getName());
-			
-			if (u != null) {
-				
-				if (!Level.canUse(u, getLevel())) return;
-				
-				sender.sendMessage(EdgeCore.usageColor + "/habitat create <cuboid> <type> <worth>");
-				sender.sendMessage(EdgeCore.usageColor + "/habitat recreate <habitat> [<type>]");
-				sender.sendMessage(EdgeCore.usageColor + "/habitat delete <habitat>");
-				sender.sendMessage(EdgeCore.usageColor + "/habitat setowner <habitat> <owner>");
-				sender.sendMessage(EdgeCore.usageColor + "/habitat settenant <habitat> <tenant>");
-				sender.sendMessage(EdgeCore.usageColor + "/habitat setworth <habitat> <worth>");
-				sender.sendMessage(EdgeCore.usageColor + "/habitat setrental <habitat> <rental>");
-				sender.sendMessage(EdgeCore.usageColor + "/habitat info <habitat>");
-				sender.sendMessage(EdgeCore.usageColor + "/habitat types");
-				
-			}
-		}
+	public void sendUsageImpl(CommandSender sender) {
+		if (!(sender instanceof Player)) return;
+		
+		sender.sendMessage(EdgeCore.usageColor + "/habitat create <cuboid> <type> <worth>");
+		sender.sendMessage(EdgeCore.usageColor + "/habitat recreate <habitat> [<type>]");
+		sender.sendMessage(EdgeCore.usageColor + "/habitat delete <habitat>");
+		sender.sendMessage(EdgeCore.usageColor + "/habitat setowner <habitat> <owner>");
+		sender.sendMessage(EdgeCore.usageColor + "/habitat settenant <habitat> <tenant>");
+		sender.sendMessage(EdgeCore.usageColor + "/habitat setworth <habitat> <worth>");
+		sender.sendMessage(EdgeCore.usageColor + "/habitat setrental <habitat> <rental>");
+		sender.sendMessage(EdgeCore.usageColor + "/habitat info <habitat>");
+		sender.sendMessage(EdgeCore.usageColor + "/habitat types");
 	}
 	
 	@Override

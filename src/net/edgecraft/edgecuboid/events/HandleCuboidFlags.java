@@ -40,8 +40,8 @@ public class HandleCuboidFlags implements Listener {
 			
 			Cuboid cuboid = Cuboid.getCuboid(player.getLocation());
 			
-			if (cuboid == null ) {
-				if (!WorldManager.getInstance().isGlobalBlockInteractionAllowed()) {
+			if (cuboid == null) {
+				if (!WorldManager.getInstance().isGlobalBlockInteractionAllowed() && !Level.canUse(user, Level.ARCHITECT)) {
 					
 					player.sendMessage(lang.getColoredMessage(user.getLanguage(), "cuboid_nopermission"));
 					event.setCancelled(true);
@@ -50,6 +50,13 @@ public class HandleCuboidFlags implements Listener {
 			}
 			
 			if (cuboid != null) {
+				if (!WorldManager.getInstance().isGlobalBlockInteractionAllowed() && !Level.canUse(user, Level.ARCHITECT)) {
+					
+					player.sendMessage(lang.getColoredMessage(user.getLanguage(), "cuboid_nopermission"));
+					event.setCancelled(true);
+					
+				}
+				
 				if (!Flag.hasFlag(cuboid, Flag.BreakBlocks, player.getName())) {
 					
 					player.sendMessage(lang.getColoredMessage(user.getLanguage(), "cuboid_nopermission"));
@@ -71,7 +78,7 @@ public class HandleCuboidFlags implements Listener {
 			Cuboid cuboid = Cuboid.getCuboid(player.getLocation());
 			
 			if (cuboid == null ) {
-				if (!WorldManager.getInstance().isGlobalBlockInteractionAllowed()) {
+				if (!WorldManager.getInstance().isGlobalBlockInteractionAllowed() && !Level.canUse(user, Level.ARCHITECT)) {
 					
 					player.sendMessage(lang.getColoredMessage(user.getLanguage(), "cuboid_nopermission"));
 					event.setCancelled(true);
@@ -80,6 +87,13 @@ public class HandleCuboidFlags implements Listener {
 			}
 			
 			if (cuboid != null) {
+				if (!WorldManager.getInstance().isGlobalBlockInteractionAllowed() && !Level.canUse(user, Level.ARCHITECT)) {
+					
+					player.sendMessage(lang.getColoredMessage(user.getLanguage(), "cuboid_nopermission"));
+					event.setCancelled(true);
+					
+				}
+				
 				if (!Flag.hasFlag(cuboid, Flag.PlaceBlocks, player.getName())) {
 					
 					player.sendMessage(lang.getColoredMessage(user.getLanguage(), "cuboid_nopermission"));
@@ -118,6 +132,13 @@ public class HandleCuboidFlags implements Listener {
 					}
 					
 					if (cuboid != null) {
+						if (!Level.canUse(user, Level.ARCHITECT)) {
+							
+							player.sendMessage(lang.getColoredMessage(user.getLanguage(), "cuboid_illegalplacement").replace("[0]", item));
+							event.setCancelled(true);
+							
+						}
+						
 						if (!Flag.hasFlag(cuboid, Flag.PlaceIllegalBlocks, player.getName())) {
 							
 							player.sendMessage(lang.getColoredMessage(user.getLanguage(), "cuboid_illegalplacement").replace("[0]", item));
@@ -230,6 +251,13 @@ public class HandleCuboidFlags implements Listener {
 					}
 					
 					if (cuboid != null) {
+						if (!Level.canUse(user, Level.ARCHITECT)) {
+							
+							player.sendMessage(lang.getColoredMessage(user.getLanguage(), "cuboid_nopermission"));
+							event.setCancelled(true);
+							
+						}
+						
 						if (!Flag.hasFlag(cuboid, Flag.InteractRedstone, player.getName())) {
 							
 							player.sendMessage(lang.getColoredMessage(user.getLanguage(), "cuboid_nopermission"));

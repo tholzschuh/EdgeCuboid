@@ -84,6 +84,7 @@ public class Habitat implements Serializable {
 			return byteArrayOutputStream.toByteArray();
 			
 		} catch (Exception exc) {
+			exc.printStackTrace();
 			return null;
 		}
 	}
@@ -97,7 +98,7 @@ public class Habitat implements Serializable {
 		infoMap.put("object-type", "Habitat");
 		
 		// Put information
-		infoMap.put("cuboid", getCuboid());
+		infoMap.put("cuboid", getCuboidID());
 		infoMap.put("habitat-type", getType().getTypeID());
 		infoMap.put("owner", owner);
 		infoMap.put("tenant", tenant);
@@ -120,7 +121,7 @@ public class Habitat implements Serializable {
 	private void deserialize(Map<String, Object> infoMap) {
 		if (!infoMap.containsKey("object-type") || !infoMap.get("object-type").equals("Habitat")) throw new java.util.UnknownFormatFlagsException("No Habitat");
 		
-		setCuboid((Cuboid) infoMap.get("cuboid"));
+		setCuboid(CuboidHandler.getInstance().getCuboid((int) infoMap.get("cuboid")));
 		setHabitatType(HabitatType.getType((int) infoMap.get("habitat-type")));
 		setOwner((String) infoMap.get("owner"));
 		setTenant((String) infoMap.get("tenant"));

@@ -38,6 +38,7 @@ public class Cuboid implements Serializable {
 	private HashMap<Flag, List<String>> flags;
 	private List<String> commands;
 	
+	private Location spawn;
 	private Location center;
 	private Location minLocation;
 	private Location maxLocation;
@@ -52,7 +53,7 @@ public class Cuboid implements Serializable {
 	public Cuboid() { /* ... */ }
 	
 	protected Cuboid(String name, int id, int ownerID, CuboidType cuboidType, Level modifyLevel,
-					Location minLocation, Location maxLocation, World world, String enterMessage, String leaveMessage,
+					Location spawn, Location minLocation, Location maxLocation, World world, String enterMessage, String leaveMessage,
 					List<String> participants, List<CuboidEvent> events, HashMap<Flag, List<String>> flags, List<String> commands) {
 		
 		setName(name);
@@ -60,20 +61,23 @@ public class Cuboid implements Serializable {
 		setOwnerID(ownerID);
 		setCuboidType(cuboidType);
 		setModifyLevel(null);
+		
+		setSpawnLocation(spawn);
 		setMinLocation(minLocation);
 		setMaxLocation(maxLocation);
 		setWorld(world);
+		calculateCenter();
+		calculateArea();
+		calculateVolume();
+		
 		setEnterMessage(enterMessage);
 		setLeaveMessage(leaveMessage);
+		
 		setParticipants(participants);
 		setEvents(events);
 		getEvents().addAll(cuboidType.getEventList());
 		setFlags(flags);
 		setCommands(commands);
-		
-		calculateCenter();
-		calculateArea();
-		calculateVolume();
 		
 	}
 	
@@ -137,6 +141,11 @@ public class Cuboid implements Serializable {
 		infoMap.put("modifylevel", getModifyLevel().value());
 		
 		// Put location information
+		infoMap.put("spawn-x", getSpawn().getBlockX());
+		infoMap.put("spawn-y", getSpawn().getBlockY());
+		infoMap.put("spawn-z", getSpawn().getBlockZ());
+		infoMap.put("spawn-yaw", getSpawn().getYaw());
+		infoMap.put("spawn-pitch", getSpawn().getPitch());
 		infoMap.put("minlocation-x", getMinLocation().getBlockX());
 		infoMap.put("minlocation-y", getMinLocation().getBlockY());
 		infoMap.put("minlocation-z", getMinLocation().getBlockZ());
@@ -171,13 +180,21 @@ public class Cuboid implements Serializable {
 		setOwnerID((int) infoMap.get("owner-id"));
 		setCuboidType(CuboidType.getType((int) infoMap.get("cuboid-type")));
 		setModifyLevel(Level.getInstance((int) infoMap.get("modifylevel")));
-
+		
+		Location spawn = new Location(((World) Bukkit.getWorld((String) infoMap.get("world"))), 
+										(int) infoMap.get("spawn-x"), (int) infoMap.get("spawn-y"), (int) infoMap.get("spawn-z"), 
+										(float) infoMap.get("spawn-yaw"), (float) infoMap.get("spawn-pitch"));
+		
 		Location min = new Location(((World) Bukkit.getWorld((String) infoMap.get("world"))), (int) infoMap.get("minlocation-x"), (int) infoMap.get("minlocation-y"), (int) infoMap.get("minlocation-z"));
 		Location max = new Location(((World) Bukkit.getWorld((String) infoMap.get("world"))), (int) infoMap.get("maxlocation-x"), (int) infoMap.get("maxlocation-y"), (int) infoMap.get("maxlocation-z"));
-
+		
+		setSpawnLocation(spawn);
 		setMinLocation(min);
 		setMaxLocation(max);
 		setWorld((World) Bukkit.getWorld((String) infoMap.get("world")));
+		calculateCenter();
+		calculateArea();
+		calculateVolume();
 
 		setParticipants((List<String>) infoMap.get("participants"));		
 		setEvents((List<CuboidEvent>) infoMap.get("events"));
@@ -386,7 +403,15 @@ public class Cuboid implements Serializable {
 	public boolean isCommandAllowed(AbstractCommand cmd) {
 		return getAllowedCommands().contains(cmd.getName());
 	}
-
+	
+	/**
+	 * Returns the location where teleported players will spawn at
+	 * @return Location
+	 */
+	public Location getSpawn() {
+		return spawn;
+	}
+	
 	/**
 	 * Returns the location of the cuboids' center
 	 * @return SerializableLocation
@@ -688,7 +713,24 @@ public class Cuboid implements Serializable {
 		
 		this.commands = cmds;
 	}
-
+	
+	/**
+	 * Updates the cuboids' spawn
+	 * @param spawn
+	 */
+	public void updateSpawn(Location spawn) {
+		setSpawnLocation(spawn);
+	}
+	
+	/**
+	 * Sets the cuboids' spawn
+	 * @param spawn
+	 */
+	protected void setSpawnLocation(Location spawn) {
+		if (spawn != null)
+			this.spawn = spawn;
+	}
+	
 	/**
 	 * Sets the cuboids' center
 	 * @param center
@@ -746,8 +788,7 @@ public class Cuboid implements Serializable {
 	 * @param area
 	 */
 	protected void setArea(int area) {
-		if (area > 0)
-			this.area = area;
+		this.area = Math.abs(area);
 	}
 
 	/**
@@ -755,10 +796,7 @@ public class Cuboid implements Serializable {
 	 * @param volume
 	 */
 	protected void setVolume(int volume) {
-		if (volume < 0)
-			this.volume = volume * (-1);
-		else
-			this.volume = volume;
+		this.volume = Math.abs(volume);
 	}
 
 	/**

@@ -1,7 +1,6 @@
 package net.edgecraft.edgecuboid.commands;
 
 import net.edgecraft.edgecore.EdgeCore;
-import net.edgecraft.edgecore.EdgeCoreAPI;
 import net.edgecraft.edgecore.command.AbstractCommand;
 import net.edgecraft.edgecore.command.Level;
 import net.edgecraft.edgecore.user.User;
@@ -15,6 +14,14 @@ import org.bukkit.entity.Player;
 public class CFindCommand extends AbstractCommand {
 	
 	private final CuboidHandler cuboidHandler = CuboidHandler.getInstance();
+	
+	private static final CFindCommand instance = new CFindCommand();
+	
+	private CFindCommand() { super(); }
+	
+	public static final CFindCommand getInstance() {
+		return instance;
+	}
 	
 	@Override
 	public Level getLevel() {
@@ -33,29 +40,16 @@ public class CFindCommand extends AbstractCommand {
 	}
 	
 	@Override
-	public  void sendUsage(CommandSender sender) {
-		if (sender instanceof Player) {
-			
-			User u = EdgeCoreAPI.userAPI().getUser(sender.getName());
-			
-			if (u != null) {
-				
-				if (!Level.canUse(u, getLevel())) return;
-				
-				sender.sendMessage(EdgeCore.usageColor + "/cfind");
-			}
-		}
+	public  void sendUsageImpl(CommandSender sender) {
+		if (!(sender instanceof Player)) return;
+		
+		sender.sendMessage(EdgeCore.usageColor + "/cfind");
 	}
 	
 	@Override
 	public boolean runImpl(Player player, User user, String[] args) throws Exception {
 		
 		String userLang = user.getLanguage();
-		
-		if (!Level.canUse(user, getLevel())) {
-			player.sendMessage(lang.getColoredMessage(userLang, "nopermission"));
-			return true;
-		}
 		
 		if (cuboidHandler.isSearching(player.getName())) {
 			player.sendMessage(lang.getColoredMessage(userLang, "cuboid_find_stop"));

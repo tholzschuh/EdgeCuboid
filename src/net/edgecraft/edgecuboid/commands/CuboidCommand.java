@@ -20,6 +20,14 @@ public class CuboidCommand extends AbstractCommand {
 	
 	private final CuboidHandler cuboidHandler = CuboidHandler.getInstance();
 	
+	private static final CuboidCommand instance = new CuboidCommand();
+	
+	private CuboidCommand() { super(); }
+	
+	public static final CuboidCommand getInstance() {
+		return instance;
+	}
+	
 	@Override
 	public Level getLevel() {
 		return Level.valueOf(EdgeCuboid.getInstance().getConfig().getString("Command.cuboid"));
@@ -37,37 +45,23 @@ public class CuboidCommand extends AbstractCommand {
 	}
 	
 	@Override
-	public void sendUsage(CommandSender sender) {
-		if (sender instanceof Player) {
-			
-			User u = EdgeCoreAPI.userAPI().getUser(sender.getName());
-			
-			if (u != null) {
-				
-				if (!Level.canUse(u, getLevel())) return;
-				
-				sender.sendMessage(EdgeCore.usageColor + "/cuboid create <name> <type>");
-				sender.sendMessage(EdgeCore.usageColor + "/cuboid recreate <name> [<type>]");
-				sender.sendMessage(EdgeCore.usageColor + "/cuboid delete <cuboid>");
-				sender.sendMessage(EdgeCore.usageColor + "/cuboid commands");
-				sender.sendMessage(EdgeCore.usageColor + "/cuboid edit");
-				sender.sendMessage(EdgeCore.usageColor + "/cuboid setowner <new owner>");
-				sender.sendMessage(EdgeCore.usageColor + "/cuboid info <name>");
-				sender.sendMessage(EdgeCore.usageColor + "/cuboid types");
-				
-			}
-		}
+	public void sendUsageImpl(CommandSender sender) {
+		if (!(sender instanceof Player)) return;
+		
+		sender.sendMessage(EdgeCore.usageColor + "/cuboid create <name> <type>");
+		sender.sendMessage(EdgeCore.usageColor + "/cuboid recreate <name> [<type>]");
+		sender.sendMessage(EdgeCore.usageColor + "/cuboid delete <cuboid>");
+		sender.sendMessage(EdgeCore.usageColor + "/cuboid commands");
+		sender.sendMessage(EdgeCore.usageColor + "/cuboid edit");
+		sender.sendMessage(EdgeCore.usageColor + "/cuboid setowner <new owner>");
+		sender.sendMessage(EdgeCore.usageColor + "/cuboid info <name>");
+		sender.sendMessage(EdgeCore.usageColor + "/cuboid types");
 	}
 	
 	@Override
 	public boolean runImpl(Player player, User user, String[] args) throws Exception {
 		
 		String userLang = user.getLanguage();
-		
-		if (!Level.canUse(user, getLevel())) {
-			player.sendMessage(lang.getColoredMessage(userLang, "nopermission"));
-			return true;
-		}
 		
 		if (args[1].equalsIgnoreCase("create")) {
 			if (args.length != 4) {

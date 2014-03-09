@@ -6,6 +6,7 @@ import net.edgecraft.edgecore.user.User;
 import net.edgecraft.edgecuboid.EdgeCuboid;
 import net.edgecraft.edgecuboid.cuboid.Cuboid;
 import net.edgecraft.edgecuboid.cuboid.CuboidEvent;
+import net.edgecraft.edgecuboid.cuboid.CuboidHandler;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -43,19 +44,19 @@ public class HandleCuboidEvents implements Listener {
 						player.showPlayer(p);
 					}
 					
+					for (Cuboid c : CuboidHandler.getInstance().getCuboids().values()) {
+						if (c.getParticipants().contains(player.getName()))
+							c.getParticipants().remove(player.getName());
+					}
 				} 
 				
 				if (cuboid != null) {				
-										
-					if (!cuboid.isInside(event.getTo()) && cuboid.getParticipants().contains(player.getName())) {
-						cuboid.getParticipants().remove(player.getName());
-					}
 					
 					if (!cuboid.getParticipants().contains(player.getName())) {
 						cuboid.getParticipants().add(player.getName());
 					}
 										
-					if (!cuboid.getParticipants().contains(player.getName())) return; // Do not go further for events if players aren't participant
+					if (!cuboid.getParticipants().contains(player.getName())) return; // Do not go further for events if players aren't participants
 					
 					if (cuboid.hasEvent(CuboidEvent.Heal)) {
 						
@@ -68,8 +69,9 @@ public class HandleCuboidEvents implements Listener {
 					
 					if (cuboid.hasEvent(CuboidEvent.Hurt)) {
 						
-						if (player.getGameMode() == GameMode.CREATIVE)
-							player.setHealth(player.getHealth());
+						if (player.getGameMode() == GameMode.CREATIVE) {
+							return;
+						}
 						
 						double health = player.getHealth() - 2D;
 						if (health <= 0) health = 0;
@@ -114,71 +116,63 @@ public class HandleCuboidEvents implements Listener {
 	@EventHandler
 	public void handleDamage(EntityDamageEvent event) {
 		
-		if (EdgeCuboid.isEventTaskReady()) {
+		Entity entity = event.getEntity();
+		
+		if (entity instanceof Player) {
 			
-			Entity entity = event.getEntity();
+			Player player = (Player) entity;
+			Cuboid cuboid = Cuboid.getCuboid(player.getLocation());
 			
-			if (entity instanceof Player) {
+			if (cuboid != null) {
 				
-				Player player = (Player) entity;
-				Cuboid cuboid = Cuboid.getCuboid(player.getLocation());
+				if (cuboid.hasEvent(CuboidEvent.God)) {
+					event.setCancelled(true);
+				}
 				
-				if (cuboid != null) {
+				if (event instanceof EntityDamageByEntityEvent) {
 					
-					if (cuboid.hasEvent(CuboidEvent.God)) {
-						event.setCancelled(true);
-					}
+					Entity damager = ((EntityDamageByEntityEvent) event).getDamager();
 					
-					if (event instanceof EntityDamageByEntityEvent) {
+					if (!cuboid.hasEvent(CuboidEvent.PvP)) {
 						
-						Entity damager = ((EntityDamageByEntityEvent) event).getDamager();
-						
-						if (!cuboid.hasEvent(CuboidEvent.PvP)) {
+						if (damager instanceof Arrow) {
 							
-							if (damager instanceof Arrow) {
-								
-								damager = ((Arrow) damager).getShooter();
-								
-								if (damager instanceof Player)
-									event.setCancelled(true);
-							}
+							damager = ((Arrow) damager).getShooter();
 							
 							if (damager instanceof Player)
 								event.setCancelled(true);
 						}
+						
+						if (damager instanceof Player)
+							event.setCancelled(true);
 					}
 				}
 			}
-			
-		}		
+		}
 	}
 	
 	@EventHandler
 	public void handleChat(AsyncPlayerChatEvent event) {
 		
-		if (EdgeCuboid.isEventTaskReady()) {
+		Player player = event.getPlayer();
+		User user = EdgeCoreAPI.userAPI().getUser(player.getName());
+		
+		if (user != null) {
 			
-			Player player = event.getPlayer();
-			User user = EdgeCoreAPI.userAPI().getUser(player.getName());
+			Cuboid cuboid = Cuboid.getCuboid(player.getLocation());
 			
-			if (user != null) {
+			if (cuboid != null) {				
 				
-				Cuboid cuboid = Cuboid.getCuboid(player.getLocation());
-				
-				if (cuboid != null) {				
-					System.out.println(cuboid.hasEvent(CuboidEvent.NoChat) + " - " + cuboid.getParticipants().contains(player.getName()));
-					if (cuboid.hasEvent(CuboidEvent.NoChat) && cuboid.getParticipants().contains(player.getName())) {
+				if (cuboid.hasEvent(CuboidEvent.NoChat) && cuboid.getParticipants().contains(player.getName())) {
+					
+					if (!Level.canUse(user, Level.SUPPORTER)) {
 						
-						if (!Level.canUse(user, Level.SUPPORTER)) {
-							
-							event.getRecipients().remove(player.getName());
-							event.setCancelled(true);
-							
-						}
-					}				
-				}
+						event.getRecipients().remove(player.getName());
+						event.setCancelled(true);
+						
+					}
+				}				
 			}
-			
 		}		
-	}
+	}	
 }

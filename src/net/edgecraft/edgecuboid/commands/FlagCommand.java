@@ -18,6 +18,14 @@ public class FlagCommand extends AbstractCommand {
 	
 	private final CuboidHandler cuboidHandler = CuboidHandler.getInstance();
 	
+	private static final FlagCommand instance = new FlagCommand();
+	
+	private FlagCommand() { super(); }
+	
+	public static final FlagCommand getInstance() {
+		return instance;
+	}
+	
 	@Override
 	public Level getLevel() {
 		return Level.valueOf(EdgeCuboid.getInstance().getConfig().getString("Command.flag"));
@@ -35,32 +43,18 @@ public class FlagCommand extends AbstractCommand {
 	}
 	
 	@Override
-	public void sendUsage(CommandSender sender) {
-		if (sender instanceof Player) {
-			
-			User u = EdgeCoreAPI.userAPI().getUser(sender.getName());
-			
-			if (u != null) {
-				
-				if (!Level.canUse(u, getLevel())) return;
-				
-				sender.sendMessage(EdgeCore.usageColor + "/flag toggle <cuboid> <user> <flag>");
-				sender.sendMessage(EdgeCore.usageColor + "/flag check <cuboid> <user>");
-				sender.sendMessage(EdgeCore.usageColor + "/flag list");
-				
-			}
-		}
+	public void sendUsageImpl(CommandSender sender) {
+		if (!(sender instanceof Player)) return;
+		
+		sender.sendMessage(EdgeCore.usageColor + "/flag toggle <cuboid> <user> <flag>");
+		sender.sendMessage(EdgeCore.usageColor + "/flag check <cuboid> <user>");
+		sender.sendMessage(EdgeCore.usageColor + "/flag list");	
 	}
 	
 	@Override
 	public boolean runImpl(Player player, User user, String[] args) throws Exception {
 		
 		String userLang = user.getLanguage();
-		
-		if (!Level.canUse(user, getLevel())) {
-			player.sendMessage(lang.getColoredMessage(userLang, "nopermission"));
-			return true;
-		}
 		
 		if (args[1].equalsIgnoreCase("toggle")) {
 			if (args.length != 5) {
