@@ -95,10 +95,10 @@ public class ShopHandler {
 		ShopHandler.looseInvOnDeath = var;
 	}
 	
-	public void registerShop(Cuboid c, ShopType type, String owner, double price, boolean buyable, double rental, boolean rentable, Map<EdgeItemStack, Double> guiItems, boolean distribution) {		
+	public void registerShop(Cuboid c, ShopType type, String owner, double price, boolean buyable, double rental, boolean rentable, Map<EdgeItemStack, Double> guiItems, double income, boolean distribution) {		
 		try {
 			
-			Shop shop = new Shop(c, type, owner, price, buyable, rental, rentable, guiItems, distribution);
+			Shop shop = new Shop(c, type, owner, price, buyable, rental, rentable, guiItems, income, distribution);
 			byte[] shopByteArray = shop.toByteArray();
 			Blob blob = new SerialBlob(shopByteArray);
 			

@@ -61,11 +61,14 @@ public class Shop implements Serializable {
 	
 	private Inventory gui;
 	private Map<EdgeItemStack, Double> guiItems = new HashMap<>();
+	private double income;
 	private boolean allowDistribution;
+	
+	private String lastCustomer;
 	
 	protected Shop() { /* Singleton */ }
 	
-	public Shop(Cuboid cuboid, ShopType type, String owner, double price, boolean buyable, double rental, boolean rentable, Map<EdgeItemStack, Double> guiItems, boolean distribution) {
+	public Shop(Cuboid cuboid, ShopType type, String owner, double price, boolean buyable, double rental, boolean rentable, Map<EdgeItemStack, Double> guiItems, double income, boolean distribution) {
 		
 		setCuboid(cuboid);
 		setType(type);
@@ -76,6 +79,7 @@ public class Shop implements Serializable {
 		setRentableStatus(rentable);
 		setupShopGui();
 		setGuiItems(guiItems);
+		setIncome(income);
 		setDistribution(distribution);
 		
 	}
@@ -138,6 +142,7 @@ public class Shop implements Serializable {
 		setRental(shop.getRental());
 		setRentableStatus(shop.isRentable());
 		setGuiItems(shop.getGuiItems());
+		setIncome(shop.getIncome());
 		setDistribution(shop.isDistributionAllowed());
 		setupShopGui();
 		
@@ -225,8 +230,25 @@ public class Shop implements Serializable {
 			return 0.0D;
 	}
 	
+	public double getIncome() {
+		return income;
+	}
+	
 	public boolean isDistributionAllowed() {
 		return allowDistribution;
+	}
+	
+	public String getLastCostumer() {
+		return lastCustomer;
+	}
+	
+	public User getLastCostumerUser() {
+		return EdgeCoreAPI.userAPI().getUser(lastCustomer);
+	}
+	
+	protected void setLastCostumer(String name) {
+		if (name != null)
+			this.lastCustomer = name;
 	}
 
 	protected void setCuboid(Cuboid cuboid) {
@@ -298,14 +320,17 @@ public class Shop implements Serializable {
 	
 	public void updateGuiItems(Map<EdgeItemStack, Double> guiItems) {
 		setGuiItems(guiItems);
+		setupShopGui();
 	}
 	
 	public void addItem(EdgeItemStack item, double pricePerItem) {
 		getGuiItems().put(item, pricePerItem);
+		setupShopGui();
 	}
 	
 	public void removeItem(EdgeItemStack item) {
 		getGuiItems().remove(item);
+		setupShopGui();
 	}
 	
 	public boolean sellsItem(EdgeItemStack item) {
@@ -338,6 +363,8 @@ public class Shop implements Serializable {
 			
 			ep.updateCash(ep.getCash() - getItemPrice(guiItem));
 			shop.updateBalance(shop.getBalance() + getItemPrice(guiItem));
+			updateIncome(getIncome() + getItemPrice(guiItem));
+			setLastCostumer(ep.getName());
 			
 			player.getInventory().addItem(new ItemStack(guiItem.toBukkitItemStack()));
 			
@@ -362,6 +389,8 @@ public class Shop implements Serializable {
 			
 			acc.updateBalance(acc.getBalance() - getItemPrice(guiItem));
 			shop.updateBalance(shop.getBalance() + getItemPrice(guiItem));
+			updateIncome(getIncome() + getItemPrice(guiItem));
+			setLastCostumer(acc.getOwner());
 			
 			EdgeConomyAPI.transactionAPI().addTransaction(shop, acc, getItemPrice(guiItem), "Shop Transaction");
 			
@@ -401,6 +430,8 @@ public class Shop implements Serializable {
 			
 			ep.updateCash(ep.getCash() + getItemPrice(guiItem));
 			shop.updateBalance(shop.getBalance() - getItemPrice(guiItem));
+			updateIncome(getIncome() - getItemPrice(guiItem));
+			setLastCostumer(ep.getName());
 			
 			player.getItemInHand().setAmount(player.getItemInHand().getAmount() - 1);
 			
@@ -438,6 +469,8 @@ public class Shop implements Serializable {
 			
 			acc.updateBalance(acc.getBalance() + getItemPrice(guiItem));
 			shop.updateBalance(shop.getBalance() - getItemPrice(guiItem));
+			updateIncome(getIncome() - getItemPrice(guiItem));
+			setLastCostumer(acc.getOwner());
 			
 			player.getItemInHand().setAmount(player.getItemInHand().getAmount() - 1);
 			
@@ -446,6 +479,17 @@ public class Shop implements Serializable {
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void updateIncome(double income) {
+		setIncome(income);
+	}
+	
+	protected void setIncome(double income) {
+		if (income <= 0)
+			this.income = this.income + 0;
+		else
+			this.income = this.income + income;
 	}
 	
 	protected void setupShopGui() {

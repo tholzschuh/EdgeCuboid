@@ -94,6 +94,7 @@ public class ConfigHandler {
 		
 		ShopHandler.setShopFrames(getConfig().getStringList("Shop.FrameItems"));
 		ShopHandler.toggleInventoryLoosing(getConfig().getBoolean("Shop.LooseInvOnDeath"));
+		
 	}
 	
 	/**
