@@ -6,12 +6,11 @@ public enum CuboidEvent implements Serializable {
 	
 	PvP(0),
 	God(1),
-	Mob(2),
-	Heal(3),
-	Hurt(4),
-	Invis(5),
-	NoChat(6),
-	NoEnter(7);
+	Heal(2),
+	Hurt(3),
+	Invis(4),
+	NoChat(5),
+	NoEnter(6);
 	
 	private int typeID;
 	
@@ -25,7 +24,7 @@ public enum CuboidEvent implements Serializable {
 	
 	public static CuboidEvent[] getCuboidEvents() {
 		
-		CuboidEvent[] types = { CuboidEvent.PvP, CuboidEvent.God, CuboidEvent.Mob, CuboidEvent.Heal, CuboidEvent.Hurt, CuboidEvent.Invis, CuboidEvent.NoChat, CuboidEvent.NoEnter };
+		CuboidEvent[] types = { CuboidEvent.PvP, CuboidEvent.God, CuboidEvent.Heal, CuboidEvent.Hurt, CuboidEvent.Invis, CuboidEvent.NoChat, CuboidEvent.NoEnter };
 		return types;
 		
 	}

@@ -4,6 +4,7 @@ import net.edgecraft.edgecore.EdgeCoreAPI;
 import net.edgecraft.edgecore.command.Level;
 import net.edgecraft.edgecore.user.User;
 import net.edgecraft.edgecuboid.EdgeCuboid;
+import net.edgecraft.edgecuboid.cuboid.Cuboid;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -45,7 +46,7 @@ public class HandleWorldEvents implements Listener {
 					// Get radius and distance to radius
 					int radius = WorldManager.getInstance().getWorldBorder();
 					double distance = location.distance(spawnLoc);
-										
+									
 					if (distance >= radius) {
 						
 						// Check if the player's in a vehicle
@@ -94,7 +95,7 @@ public class HandleWorldEvents implements Listener {
 	
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void handleBlockBurn(BlockBurnEvent event) {		
-		if (!WorldManager.getInstance().isFireSpreadAllowed()) {
+		if (!WorldManager.getInstance().isFireSpreadAllowed() && Cuboid.getCuboid(event.getBlock().getLocation()) == null) {
 			
 			event.setCancelled(true);
 			

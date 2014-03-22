@@ -69,11 +69,11 @@ public class HandleCuboidEvents implements Listener {
 					
 					if (cuboid.hasEvent(CuboidEvent.Hurt)) {
 						
-						if (player.getGameMode() == GameMode.CREATIVE) {
+						if (player.getGameMode() == GameMode.CREATIVE || cuboid.hasEvent(CuboidEvent.God) || cuboid.hasEvent(CuboidEvent.Heal)) {
 							return;
 						}
 						
-						double health = player.getHealth() - 2D;
+						double health = player.getHealth() - 1D;
 						if (health <= 0) health = 0;
 						
 						player.setHealth(health);

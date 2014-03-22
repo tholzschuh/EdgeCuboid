@@ -6,7 +6,9 @@ import net.edgecraft.edgecore.lang.LanguageHandler;
 import net.edgecraft.edgecore.user.User;
 import net.edgecraft.edgecuboid.cuboid.Cuboid;
 import net.edgecraft.edgecuboid.cuboid.Flag;
+import net.edgecraft.edgecuboid.cuboid.types.CuboidType;
 import net.edgecraft.edgecuboid.world.WorldManager;
+import net.edgecraft.edgejobs.api.JobManager;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -41,16 +43,26 @@ public class HandleCuboidFlags implements Listener {
 			Cuboid cuboid = Cuboid.getCuboid(player.getLocation());
 			
 			if (cuboid == null) {
+				
 				if (!WorldManager.getInstance().isGlobalBlockInteractionAllowed() && !Level.canUse(user, Level.ARCHITECT)) {
 					
 					player.sendMessage(lang.getColoredMessage(user.getLanguage(), "cuboid_nopermission"));
 					event.setCancelled(true);
 					
 				}
-			}
-			
-			if (cuboid != null) {
-				if (!WorldManager.getInstance().isGlobalBlockInteractionAllowed() && !Level.canUse(user, Level.ARCHITECT)) {
+				
+			} else {
+				
+				CuboidType type = CuboidType.getType(cuboid.getCuboidType());
+				
+				if (type == CuboidType.Survival && !JobManager.isWorking(player)) {
+					
+					player.sendMessage(lang.getColoredMessage(user.getLanguage(), "cuboid_nopermission"));
+					event.setCancelled(true);
+					
+				}
+				
+				if (Cuboid.getCuboid(event.getBlock().getLocation()) == null && !WorldManager.getInstance().isGlobalBlockInteractionAllowed() && !Level.canUse(user, Level.ARCHITECT)) {
 					
 					player.sendMessage(lang.getColoredMessage(user.getLanguage(), "cuboid_nopermission"));
 					event.setCancelled(true);
@@ -77,17 +89,27 @@ public class HandleCuboidFlags implements Listener {
 			
 			Cuboid cuboid = Cuboid.getCuboid(player.getLocation());
 			
-			if (cuboid == null ) {
+			if (cuboid == null) {
+				
 				if (!WorldManager.getInstance().isGlobalBlockInteractionAllowed() && !Level.canUse(user, Level.ARCHITECT)) {
 					
 					player.sendMessage(lang.getColoredMessage(user.getLanguage(), "cuboid_nopermission"));
 					event.setCancelled(true);
 					
 				}
-			}
-			
-			if (cuboid != null) {
-				if (!WorldManager.getInstance().isGlobalBlockInteractionAllowed() && !Level.canUse(user, Level.ARCHITECT)) {
+				
+			} else {
+				
+				CuboidType type = CuboidType.getType(cuboid.getCuboidType());
+				
+				if (type == CuboidType.Survival && !JobManager.isWorking(player)) {
+					
+					player.sendMessage(lang.getColoredMessage(user.getLanguage(), "cuboid_nopermission"));
+					event.setCancelled(true);
+					
+				}
+				
+				if (Cuboid.getCuboid(event.getBlock().getLocation()) == null && !WorldManager.getInstance().isGlobalBlockInteractionAllowed() && !Level.canUse(user, Level.ARCHITECT)) {
 					
 					player.sendMessage(lang.getColoredMessage(user.getLanguage(), "cuboid_nopermission"));
 					event.setCancelled(true);
@@ -116,7 +138,7 @@ public class HandleCuboidFlags implements Listener {
 				
 				Cuboid cuboid = Cuboid.getCuboid(player.getLocation());
 				Material material = event.getItem().getType();
-				String item = material.name().toLowerCase();
+				String item = material.name();
 				
 				if (material == Material.LAVA || material == Material.STATIONARY_LAVA || material == Material.LAVA_BUCKET ||
 					material == Material.WATER || material == Material.STATIONARY_WATER || material == Material.WATER_BUCKET ||

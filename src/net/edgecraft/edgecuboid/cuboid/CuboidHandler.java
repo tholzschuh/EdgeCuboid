@@ -192,7 +192,7 @@ public class CuboidHandler {
 				if (CuboidType.getType(c.getCuboidType()) == CuboidType.Public || 
 				CuboidType.getType(c.getCuboidType()) == CuboidType.Hospital || 
 				CuboidType.getType(c.getCuboidType()) == CuboidType.PoliceStation ||
-				CuboidType.getType(c.getCuboidType()) == CuboidType.FireDepartment) amount++;
+				CuboidType.getType(c.getCuboidType()) == CuboidType.FireStation) amount++;
 		}
 		
 		return (int) ((double) amount / amountOfCuboids() * 100);

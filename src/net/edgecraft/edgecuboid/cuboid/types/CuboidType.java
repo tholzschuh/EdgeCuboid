@@ -8,20 +8,24 @@ import net.edgecraft.edgecuboid.cuboid.CuboidEvent;
 
 public enum CuboidType {
 	
-	Public(0, new CuboidEvent[] { CuboidEvent.PvP }),
-	Bank(1, new CuboidEvent[] { CuboidEvent.PvP }),
-	Jail(2, new CuboidEvent[] { CuboidEvent.God, CuboidEvent.NoChat, CuboidEvent.NoEnter }),
-	Hospital(3, new CuboidEvent[] { CuboidEvent.God, CuboidEvent.Heal }),
-	PoliceStation(4, new CuboidEvent[] { CuboidEvent.PvP, CuboidEvent.Heal }),
-	FireDepartment(5, new CuboidEvent[] { CuboidEvent.PvP, CuboidEvent.Heal }),
-	ATM(6, new CuboidEvent[] { CuboidEvent.PvP }),
-	Shop(7, new CuboidEvent[] { CuboidEvent.PvP }),
-	Sight(8, new CuboidEvent[] { }),
-	Rail(9, new CuboidEvent[] { CuboidEvent.NoEnter }),
-	Street(10, new CuboidEvent[] { }),
-	Park(11, new CuboidEvent[] { CuboidEvent.PvP }),
-	Habitat(12, new CuboidEvent[] { CuboidEvent.PvP }),
-	Lift(13, new CuboidEvent[] { CuboidEvent.God, CuboidEvent.NoChat });
+	Survival(0, new CuboidEvent[] { CuboidEvent.PvP }),
+	Creative(1, new CuboidEvent[] { }),
+	Public(2, new CuboidEvent[] { CuboidEvent.PvP }),
+	Rail(3, new CuboidEvent[] { CuboidEvent.NoEnter }),
+	Street(4, new CuboidEvent[] { }),
+	Park(5, new CuboidEvent[] { CuboidEvent.PvP }),
+	Sight(6, new CuboidEvent[] { }),
+	Habitat(7, new CuboidEvent[] { CuboidEvent.PvP }),
+	Shop(8, new CuboidEvent[] { CuboidEvent.PvP }),
+	Lift(9, new CuboidEvent[] { CuboidEvent.God, CuboidEvent.NoChat }),
+	Jail(10, new CuboidEvent[] { CuboidEvent.God, CuboidEvent.NoChat, CuboidEvent.NoEnter }),
+	Airport(11, new CuboidEvent[] { CuboidEvent.PvP }),
+	Station(12, new CuboidEvent[] { CuboidEvent.PvP }),
+	Bank(13, new CuboidEvent[] { CuboidEvent.PvP }),
+	ATM(14, new CuboidEvent[] { CuboidEvent.PvP }),
+	Hospital(15, new CuboidEvent[] { CuboidEvent.God, CuboidEvent.Heal }),
+	PoliceStation(16, new CuboidEvent[] { CuboidEvent.PvP, CuboidEvent.Heal }),
+	FireStation(17, new CuboidEvent[] { CuboidEvent.PvP, CuboidEvent.Heal });
 	
 	private int typeID;
 	private CuboidEvent[] events;
@@ -47,10 +51,14 @@ public enum CuboidType {
 		
 		CuboidType[] types = 
 			{ 
-				CuboidType.Public, CuboidType.Bank, CuboidType.Jail, 
-				CuboidType.Hospital, CuboidType.PoliceStation, CuboidType.FireDepartment, 
-				CuboidType.ATM, CuboidType.Shop, CuboidType.Sight, 
-				CuboidType.Rail, CuboidType.Street, CuboidType.Park, CuboidType.Habitat 
+				
+				CuboidType.Survival, CuboidType.Creative, CuboidType.Public,
+				CuboidType.Rail, CuboidType.Street, CuboidType.Park,
+				CuboidType.Sight, CuboidType.Habitat, CuboidType.Shop,
+				CuboidType.Lift, CuboidType.Jail, CuboidType.Airport,
+				CuboidType.Station, CuboidType.Bank, CuboidType.ATM,
+				CuboidType.Hospital, CuboidType.PoliceStation, CuboidType.FireStation
+				
 			};
 		
 		return types;
