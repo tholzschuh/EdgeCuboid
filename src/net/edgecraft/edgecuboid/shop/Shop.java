@@ -19,6 +19,7 @@ import net.edgecraft.edgecore.EdgeCoreAPI;
 import net.edgecraft.edgecore.lang.LanguageHandler;
 import net.edgecraft.edgecore.user.User;
 import net.edgecraft.edgecuboid.cuboid.Cuboid;
+import net.edgecraft.edgecuboid.cuboid.CuboidHandler;
 import net.edgecraft.edgecuboid.other.EdgeItemStack;
 
 import org.bukkit.Bukkit;
@@ -73,15 +74,18 @@ public class Shop implements Serializable {
 		setCuboid(cuboid);
 		setType(type);
 		setOwner(owner);
-		setPrice(price);
+		
+		calculatePrice();
 		setBuyableStatus(buyable);
+		
 		setRental(rental);
 		setRentableStatus(rentable);
-		setupShopGui();
+		
 		setGuiItems(guiItems);
 		setIncome(income);
 		setDistribution(distribution);
 		
+		setupShopGui();		
 	}
 	
 	public static Shop toShop(byte[] byteArray) {
@@ -120,32 +124,41 @@ public class Shop implements Serializable {
 	}
 	
 	private Map<String, Object> serialize() {
-		Map<String, Object> infoMap = new LinkedHashMap<String, Object>();
-		
+		Map<String, Object> infoMap = new LinkedHashMap<String, Object>();		
 		infoMap.put("object-type", "Shop");
-		infoMap.put("object", this);
+		
+		infoMap.put("cuboid", getCuboidID());
+		infoMap.put("shop-type", getType());
+		infoMap.put("owner", getOwner());
+		calculatePrice();
+		
+		infoMap.put("buyable", isBuyable());
+		infoMap.put("rental", getRental());
+		infoMap.put("rentable", isRentable());
+		infoMap.put("gui-items", getGuiItems());
+		infoMap.put("income", getIncome());
+		infoMap.put("distribution", isDistributionAllowed());
 		
 		return infoMap;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void deserialize(Map<String, Object> infoMap) {
-		if (!infoMap.containsKey("object-type") || !infoMap.get("object-type").equals("Shop")) throw new java.util.UnknownFormatFlagsException("No Shop!");
-		if (infoMap.get("object") == null || this.equals(infoMap.get("object"))) return;
+		if (!infoMap.containsKey("object-type") || !infoMap.get("object-type").equals("Shop")) throw new java.util.UnknownFormatFlagsException("No Shop!");	
 		
-		Shop shop = (Shop) infoMap.get("object");
+		setCuboid(CuboidHandler.getInstance().getCuboid((int) infoMap.get("cuboid")));
+		setType((ShopType) infoMap.get("shop-type"));
+		setOwner((String) infoMap.get("owner"));
+		calculatePrice();
 		
-		setCuboid(shop.getCuboid());
-		setType(shop.getType());
-		setOwner(shop.getOwner());
-		setPrice(shop.getPrice());
-		setBuyableStatus(shop.isBuyable());
-		setRental(shop.getRental());
-		setRentableStatus(shop.isRentable());
-		setGuiItems(shop.getGuiItems());
-		setIncome(shop.getIncome());
-		setDistribution(shop.isDistributionAllowed());
+		setBuyableStatus((boolean) infoMap.get("buyable"));
+		setRental((double) infoMap.get("rental"));
+		setRentableStatus((boolean) infoMap.get("rentable"));
+		setGuiItems((Map<EdgeItemStack, Double>) infoMap.get("gui-items"));
+		setIncome((double) infoMap.get("income"));
+		setDistribution((boolean) infoMap.get("distribution"));
+		
 		setupShopGui();
-		
 	}
 	
 	public static Shop getShop(String player) {
@@ -200,7 +213,10 @@ public class Shop implements Serializable {
 	}
 	
 	private void calculatePrice() {
-		price = (double) getCuboid().getArea() * getGuiItems().size() / 100;
+		if (getCuboid().getArea() * getGuiItems().size() / 100 <= 0.0D)
+			this.price = 1.0D;
+		else
+			this.price = (getCuboid().getArea() * getGuiItems().size() / 100);
 	}
 	
 	public boolean isBuyable() {
@@ -224,10 +240,14 @@ public class Shop implements Serializable {
 	}
 	
 	public double getItemPrice(EdgeItemStack item) {
-		if (item != null)
-			return getGuiItems().get(item);
-		else
-			return 0.0D;
+		if (item != null) {
+			for (EdgeItemStack gui : getGuiItems().keySet()) {
+				if (gui.getType().name().equals(item.getType().name()))
+					return (double) getGuiItems().get(gui);
+			}
+		}
+		
+		return 0.0D;
 	}
 	
 	public double getIncome() {

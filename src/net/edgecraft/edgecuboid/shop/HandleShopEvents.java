@@ -43,6 +43,7 @@ public class HandleShopEvents implements Listener {
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void handleItemPurchase(InventoryClickEvent event) {
 		if (event.getClick() == ClickType.LEFT) {
@@ -59,6 +60,9 @@ public class HandleShopEvents implements Listener {
 					return;
 				
 				if (inventory.getName().equals(shop.getGui().getName())) {
+					
+					event.setCancelled(true);
+					player.updateInventory();
 					
 					if (EdgeConomyAPI.economyAPI().getAccount(player.getName()) == null) {
 						
@@ -80,6 +84,7 @@ public class HandleShopEvents implements Listener {
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void handleItemSale(InventoryClickEvent event) {
 		if (event.getClick() == ClickType.RIGHT) {
@@ -96,6 +101,9 @@ public class HandleShopEvents implements Listener {
 					return;
 				
 				if (inventory.getName().equals(shop.getGui().getName())) {
+					
+					event.setCancelled(true);
+					player.updateInventory();
 					
 					if (EdgeConomyAPI.economyAPI().getAccount(player.getName()) == null) {
 						

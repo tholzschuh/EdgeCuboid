@@ -349,227 +349,202 @@ public class ShopCommand extends AbstractCommand {
 					return true;
 				}
 				
-				if (args[1].equalsIgnoreCase("recreate")) {
-					player.sendMessage(lang.getColoredMessage(userLang, "pluginexception").replace("[0]", "EdgeCuboid"));
+			}
+			
+			if (args[1].equalsIgnoreCase("recreate")) {
+				player.sendMessage(lang.getColoredMessage(userLang, "pluginexception").replace("[0]", "EdgeCuboid"));
+				return true;
+			}
+			
+			if (args[1].equalsIgnoreCase("delete")) {
+				if (args.length != 3) {
+					sendUsage(player);
 					return true;
 				}
 				
-				if (args[1].equalsIgnoreCase("delete")) {
-					if (args.length != 3) {
-						sendUsage(player);
-						return true;
-					}
-					
-					Shop shop = shopHandler.getShop(args[2]);
-					
-					if (shop == null) {
-						player.sendMessage(lang.getColoredMessage(userLang, "unknownshop").replace("[0]", args[2]));
-						return true;
-					}
-					
-					if (!shop.isOwner(player.getName())) {
-						player.sendMessage(lang.getColoredMessage(userLang, "shop_notowner"));
-						return true;
-					}
-					
-					if (player.getInventory().firstEmpty() == -1) {
-						player.sendMessage(lang.getColoredMessage(userLang, "shop_getitem_nospace"));
-						return true;
-					}
-					
-					for (EdgeItemStack item : shop.getGuiItems().keySet()) {
-						if (item != null)
-							player.getInventory().addItem(item.toBukkitItemStack());
-					}
-					
-					shopHandler.deleteShop(shopHandler.getShop(CuboidHandler.getInstance().getCuboid(args[2])).getCuboidID());
-					player.sendMessage(lang.getColoredMessage(userLang, "admin_shop_delete_success"));
-					
-					return true;					
-				}
+				Shop shop = shopHandler.getShop(args[2]);
 				
-				if (args[1].equalsIgnoreCase("setowner")) {
-					if (args.length != 4) {
-						sendUsage(player);
-						return true;
-					}
-					
-					Shop shop = shopHandler.getShop(args[2]);
-					User newOwner = EdgeCoreAPI.userAPI().getUser(args[3]);
-					
-					if (shop == null) {
-						player.sendMessage(lang.getColoredMessage(userLang, "unknownshop").replace("[0]", args[2]));
-						return true;
-					}
-					
-					if (newOwner == null) {
-						player.sendMessage(lang.getColoredMessage(userLang, "notfound"));
-						return true;
-					}
-					
-					if (shop.isOwner(args[3])) {
-						player.sendMessage(lang.getColoredMessage(userLang, "admin_shop_setowner_alreadyowner"));
-						return true;
-					}
-					
-					if (shopHandler.getShop(args[3]) != null) {
-						player.sendMessage(lang.getColoredMessage(userLang, "admin_shop_setowner_alreadyshop"));
-						return true;
-					}
-					
-					shop.switchOwner(newOwner);
-					player.sendMessage(lang.getColoredMessage(userLang, "admin_shop_setowner_success").replace("[0]", args[2]).replace("[1]", args[3]));
-					
+				if (shop == null) {
+					player.sendMessage(lang.getColoredMessage(userLang, "unknownshop").replace("[0]", args[2]));
 					return true;
 				}
 				
-				if (args[1].equalsIgnoreCase("setbuyable")) {
-					if (args.length != 4) {
-						sendUsage(player);
-						return true;
-					}
-					
-					if (!args[3].equalsIgnoreCase("false") || !args[3].equalsIgnoreCase("true")) {
-						player.sendMessage(lang.getColoredMessage(userLang, "argumentexception"));
-						return true;
-					}
-					
-					Shop shop = shopHandler.getShop(args[2]);
-					boolean var = Boolean.parseBoolean(args[3]);
-					
-					if (shop == null) {
-						player.sendMessage(lang.getColoredMessage(userLang, "unknownshop").replace("[0]", args[2]));
-						return true;
-					}
-					
-					if (!var) {
-						
-						shop.setBuyable(false);
-						player.sendMessage(lang.getColoredMessage(userLang, "admin_shop_setbuyable_false").replace("[0]", args[2]));
-						
-						return true;
-						
-					} else {
-						
-						shop.setBuyable(true);
-						player.sendMessage(lang.getColoredMessage(userLang, "admin_shop_setbuyable_true").replace("[0]", args[2]));
-						
-						return true;
-						
-					}
-				}
-				
-				if (args[1].equalsIgnoreCase("setrental")) {
-					if (args.length != 4) {
-						sendUsage(player);
-						return true;
-					}
-					
-					Shop shop = shopHandler.getShop(args[2]);
-					double rental = Double.parseDouble(args[3]);
-					
-					if (shop == null) {
-						player.sendMessage(lang.getColoredMessage(userLang, "unknownshop").replace("[0]", args[2]));
-						return true;
-					}
-					
-					if (rental <= 0) {
-						player.sendMessage(lang.getColoredMessage(userLang, "amounttoolow"));
-						return true;
-					}
-					
-					if (rental >= shop.getPrice()) {
-						player.sendMessage(lang.getColoredMessage(userLang, "amounttoohigh"));
-						return true;
-					}
-					
-					shop.updateRental(rental);
-					player.sendMessage(lang.getColoredMessage(userLang, "admin_shop_setrental_success").replace("[0]", args[2]).replace("[1]", args[3]));
-					
+				if (!shop.isOwner(player.getName())) {
+					player.sendMessage(lang.getColoredMessage(userLang, "shop_notowner"));
 					return true;
 				}
 				
-				if (args[1].equalsIgnoreCase("setrentable")) {
-					if (args.length != 4) {
-						sendUsage(player);
-						return true;
-					}
-					
-					if (!args[3].equalsIgnoreCase("false") || !args[3].equalsIgnoreCase("true")) {
-						player.sendMessage(lang.getColoredMessage(userLang, "argumentexception"));
-						return true;
-					}
-					
-					Shop shop = shopHandler.getShop(args[2]);
-					boolean var = Boolean.parseBoolean(args[3]);
-					
-					if (shop == null) {
-						player.sendMessage(lang.getColoredMessage(userLang, "unknownshop").replace("[0]", args[2]));
-						return true;
-					}
-					
-					if (!var) {
-						
-						shop.setRentable(false);
-						player.sendMessage(lang.getColoredMessage(userLang, "admin_shop_setrentable_false").replace("[0]", args[2]));
-						
-						return true;
-						
-					} else {
-						
-						shop.setRentable(true);
-						player.sendMessage(lang.getColoredMessage(userLang, "admin_shop_setrentable_true").replace("[0]", args[2]));
-						
-						return true;
-						
-					}
-				}
-				
-				if (args[1].equalsIgnoreCase("reload")) {
-					
-					if (args.length == 2) {
-						
-						shopHandler.synchronizeShops();
-						player.sendMessage(lang.getColoredMessage(userLang, "admin_shop_reload_all_success"));
-						
-						return true;
-					}
-					
-					if (args.length == 3) {
-						
-						int shop = Integer.parseInt(args[2]);
-						
-						if (shopHandler.getShop(shop) == null) {
-							player.sendMessage(lang.getColoredMessage(userLang, "unknownshop").replace("[0]", "ID: " + shop));
-							return true;
-						}
-						
-						shopHandler.synchronizeShop(shop);
-						player.sendMessage(lang.getColoredMessage(userLang, "admin_shop_reload_success").replace("[0]", shopHandler.getShop(shop).getCuboid().getName()));
-						
-						return true;
-					}
-				}
-				
-				if (args[1].equalsIgnoreCase("types")) {
-					if (args.length != 2) {
-						sendUsage(player);
-						return true;
-					}
-					
-					StringBuilder sb = new StringBuilder();
-					
-					for (ShopType type : ShopType.values()) {
-						if (sb.length() > 0)
-							sb.append(", ");
-						
-						sb.append(ChatColor.GOLD + type.name());
-					}
-					
-					player.sendMessage(lang.getColoredMessage(userLang, "admin_shop_type_list").replace("[0]", sb.toString()));
-					
+				if (player.getInventory().firstEmpty() == -1) {
+					player.sendMessage(lang.getColoredMessage(userLang, "shop_getitem_nospace"));
 					return true;
 				}
+				
+				for (EdgeItemStack item : shop.getGuiItems().keySet()) {
+					if (item != null)
+						player.getInventory().addItem(item.toBukkitItemStack());
+				}
+				
+				shopHandler.deleteShop(shopHandler.getShop(CuboidHandler.getInstance().getCuboid(args[2])).getCuboidID());
+				player.sendMessage(lang.getColoredMessage(userLang, "admin_shop_delete_success"));
+				
+				return true;					
+			}
+			
+			if (args[1].equalsIgnoreCase("setowner")) {
+				if (args.length != 4) {
+					sendUsage(player);
+					return true;
+				}
+				
+				Shop shop = shopHandler.getShop(args[2]);
+				User newOwner = EdgeCoreAPI.userAPI().getUser(args[3]);
+				
+				if (shop == null) {
+					player.sendMessage(lang.getColoredMessage(userLang, "unknownshop").replace("[0]", args[2]));
+					return true;
+				}
+				
+				if (newOwner == null) {
+					player.sendMessage(lang.getColoredMessage(userLang, "notfound"));
+					return true;
+				}
+				
+				if (shop.isOwner(args[3])) {
+					player.sendMessage(lang.getColoredMessage(userLang, "admin_shop_setowner_alreadyowner"));
+					return true;
+				}
+				
+				if (shopHandler.getShop(args[3]) != null) {
+					player.sendMessage(lang.getColoredMessage(userLang, "admin_shop_setowner_alreadyshop"));
+					return true;
+				}
+				
+				shop.switchOwner(newOwner);
+				player.sendMessage(lang.getColoredMessage(userLang, "admin_shop_setowner_success").replace("[0]", args[2]).replace("[1]", args[3]));
+				
+				return true;
+			}
+			
+			if (args[1].equalsIgnoreCase("setbuyable")) {
+				if (args.length != 4) {
+					sendUsage(player);
+					return true;
+				}
+				
+				if (!args[3].equalsIgnoreCase("false") || !args[3].equalsIgnoreCase("true")) {
+					player.sendMessage(lang.getColoredMessage(userLang, "argumentexception"));
+					return true;
+				}
+				
+				Shop shop = shopHandler.getShop(args[2]);
+				boolean var = Boolean.parseBoolean(args[3]);
+				
+				if (shop == null) {
+					player.sendMessage(lang.getColoredMessage(userLang, "unknownshop").replace("[0]", args[2]));
+					return true;
+				}
+				
+				if (!var) {
+					
+					shop.setBuyable(false);
+					player.sendMessage(lang.getColoredMessage(userLang, "admin_shop_setbuyable_false").replace("[0]", args[2]));
+					
+					return true;
+					
+				} else {
+					
+					shop.setBuyable(true);
+					player.sendMessage(lang.getColoredMessage(userLang, "admin_shop_setbuyable_true").replace("[0]", args[2]));
+					
+					return true;
+					
+				}
+			}
+			
+			if (args[1].equalsIgnoreCase("setrental")) {
+				if (args.length != 4) {
+					sendUsage(player);
+					return true;
+				}
+				
+				Shop shop = shopHandler.getShop(args[2]);
+				double rental = Double.parseDouble(args[3]);
+				
+				if (shop == null) {
+					player.sendMessage(lang.getColoredMessage(userLang, "unknownshop").replace("[0]", args[2]));
+					return true;
+				}
+				
+				if (rental <= 0) {
+					player.sendMessage(lang.getColoredMessage(userLang, "amounttoolow"));
+					return true;
+				}
+				
+				if (rental >= shop.getPrice()) {
+					player.sendMessage(lang.getColoredMessage(userLang, "amounttoohigh"));
+					return true;
+				}
+				
+				shop.updateRental(rental);
+				player.sendMessage(lang.getColoredMessage(userLang, "admin_shop_setrental_success").replace("[0]", args[2]).replace("[1]", args[3]));
+				
+				return true;
+			}
+			
+			if (args[1].equalsIgnoreCase("setrentable")) {
+				if (args.length != 4) {
+					sendUsage(player);
+					return true;
+				}
+				
+				if (!args[3].equalsIgnoreCase("false") || !args[3].equalsIgnoreCase("true")) {
+					player.sendMessage(lang.getColoredMessage(userLang, "argumentexception"));
+					return true;
+				}
+				
+				Shop shop = shopHandler.getShop(args[2]);
+				boolean var = Boolean.parseBoolean(args[3]);
+				
+				if (shop == null) {
+					player.sendMessage(lang.getColoredMessage(userLang, "unknownshop").replace("[0]", args[2]));
+					return true;
+				}
+				
+				if (!var) {
+					
+					shop.setRentable(false);
+					player.sendMessage(lang.getColoredMessage(userLang, "admin_shop_setrentable_false").replace("[0]", args[2]));
+					
+					return true;
+					
+				} else {
+					
+					shop.setRentable(true);
+					player.sendMessage(lang.getColoredMessage(userLang, "admin_shop_setrentable_true").replace("[0]", args[2]));
+					
+					return true;
+					
+				}
+			}
+			
+			if (args[1].equalsIgnoreCase("types")) {
+				if (args.length != 2) {
+					sendUsage(player);
+					return true;
+				}
+				
+				StringBuilder sb = new StringBuilder();
+				
+				for (ShopType type : ShopType.values()) {
+					if (sb.length() > 0)
+						sb.append(", ");
+					
+					sb.append(ChatColor.GOLD + type.name());
+				}
+				
+				player.sendMessage(lang.getColoredMessage(userLang, "admin_shop_type_list").replace("[0]", sb.toString()));
+				
+				return true;
 			}
 			
 		} catch(NumberFormatException e) {
@@ -603,11 +578,9 @@ public class ShopCommand extends AbstractCommand {
 		sender.sendMessage(EdgeCore.usageColor + "/shop setbuyable <shop> <boolean>");
 		sender.sendMessage(EdgeCore.usageColor + "/shop setrental <shop> <rental>");
 		sender.sendMessage(EdgeCore.usageColor + "/shop setrentable <shop> <boolean>");
-		sender.sendMessage(EdgeCore.usageColor + "/shop info <shop>");
-		sender.sendMessage(EdgeCore.usageColor + "/shop reload [<shop>]");
 		sender.sendMessage(EdgeCore.usageColor + "/shop types");
 	}
-
+	
 	@Override
 	public boolean sysAccess(CommandSender arg0, String[] arg1) {
 		return true;

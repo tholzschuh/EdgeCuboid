@@ -120,7 +120,7 @@ public class ShopHandler {
 		
 		try {
 			
-			PreparedStatement deleteShop = db.prepareUpdate("DELETE FROM " + ShopHandler.shopTable + " WHERE id = '" + id + "';");
+			PreparedStatement deleteShop = db.prepareUpdate("DELETE FROM " + ShopHandler.shopTable + " WHERE cuboidid = '" + id + "';");
 			deleteShop.executeUpdate();
 			
 			getShops().remove(id);
