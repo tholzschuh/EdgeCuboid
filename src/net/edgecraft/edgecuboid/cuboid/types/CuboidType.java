@@ -27,8 +27,8 @@ public enum CuboidType {
 	PoliceStation(16, new CuboidEvent[] { CuboidEvent.PvP, CuboidEvent.Heal }),
 	FireStation(17, new CuboidEvent[] { CuboidEvent.PvP, CuboidEvent.Heal });
 	
-	private int typeID;
-	private CuboidEvent[] events;
+	private final int typeID;
+	private final CuboidEvent[] events;
 	
 	private CuboidType(int typeID, CuboidEvent[] events) {
 		this.typeID = typeID;
@@ -49,7 +49,7 @@ public enum CuboidType {
 	
 	public static CuboidType[] getCuboidTypes() {
 		
-		CuboidType[] types = 
+		final CuboidType[] types = 
 			{ 
 				
 				CuboidType.Survival, CuboidType.Creative, CuboidType.Public,
@@ -67,7 +67,7 @@ public enum CuboidType {
 	
 	public static CuboidType getType(int id) {
 		
-		CuboidType[] types = getCuboidTypes();
+		final CuboidType[] types = getCuboidTypes();
 		
 		for (int i = 0; i < types.length; i++) {
 			if (id == types[i].getTypeID()) {

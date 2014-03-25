@@ -4,7 +4,7 @@ import net.edgecraft.edgecuboid.cuboid.CuboidHandler;
 import net.edgecraft.edgecuboid.shop.ShopHandler;
 import net.edgecraft.edgecuboid.world.WorldManager;
 
-public class EdgeCuboidAPI {
+public final class EdgeCuboidAPI {
 	
 	private static final CuboidHandler cuboidAPI = EdgeCuboid.getCuboidAPI();
 	private static final WorldManager worldAPI = EdgeCuboid.getWorldAPI();

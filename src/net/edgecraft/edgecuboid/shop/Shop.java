@@ -32,12 +32,12 @@ public class Shop implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private final LanguageHandler lang = EdgeCoreAPI.languageAPI();
 	
-	public enum ShopType {
+	public static enum ShopType {
 		
 		Standard(false),
 		User(true);
 		
-		private boolean buyable;
+		private final boolean buyable;
 		
 		private ShopType(boolean buyable) {
 			this.buyable = buyable;
@@ -91,13 +91,12 @@ public class Shop implements Serializable {
 	public static Shop toShop(byte[] byteArray) {
 		try {
 			
-			ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArray);
-			ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+			final ObjectInputStream in = new ObjectInputStream( new ByteArrayInputStream( byteArray ) );
 			
 			@SuppressWarnings("unchecked")
-			Map<String, Object> infoMap = (Map<String, Object>) objectInputStream.readObject();
+			final Map<String, Object> infoMap = (Map<String, Object>) in.readObject();
 			
-			Shop shop = new Shop();
+			final Shop shop = new Shop();
 			shop.deserialize(infoMap);
 			
 			return shop;
@@ -111,11 +110,10 @@ public class Shop implements Serializable {
 	public byte[] toByteArray() {
 		try {
 			
-			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-			ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
-			objectOutputStream.writeObject(serialize());
+			final ByteArrayOutputStream out = new ByteArrayOutputStream();
+			new ObjectOutputStream( out ).writeObject(serialize());
 			
-			return byteArrayOutputStream.toByteArray();
+			return out.toByteArray();
 			
 		} catch (Exception exc) {
 			exc.printStackTrace();
@@ -124,7 +122,7 @@ public class Shop implements Serializable {
 	}
 	
 	private Map<String, Object> serialize() {
-		Map<String, Object> infoMap = new LinkedHashMap<String, Object>();		
+		final Map<String, Object> infoMap = new LinkedHashMap<String, Object>();		
 		infoMap.put("object-type", "Shop");
 		
 		infoMap.put("cuboid", getCuboidID());
@@ -378,8 +376,8 @@ public class Shop implements Serializable {
 				return;
 			}
 			
-			Player player = ep.getUser().getPlayer();
-			BankAccount shop = Economy.getInstance().getAccount(getOwner());
+			final Player player = ep.getUser().getPlayer();
+			final BankAccount shop = Economy.getInstance().getAccount(getOwner());
 			
 			ep.updateCash(ep.getCash() - getItemPrice(guiItem));
 			shop.updateBalance(shop.getBalance() + getItemPrice(guiItem));
@@ -404,8 +402,8 @@ public class Shop implements Serializable {
 				return;
 			}
 			
-			Player player = acc.getUser().getPlayer();
-			BankAccount shop = Economy.getInstance().getAccount(getOwner());
+			final Player player = acc.getUser().getPlayer();
+			final BankAccount shop = Economy.getInstance().getAccount(getOwner());
 			
 			acc.updateBalance(acc.getBalance() - getItemPrice(guiItem));
 			shop.updateBalance(shop.getBalance() + getItemPrice(guiItem));
@@ -429,7 +427,7 @@ public class Shop implements Serializable {
 			if (!getGuiItems().containsKey(guiItem)) return;
 			if (!isDistributionAllowed()) return;
 			
-			Player player = ep.getUser().getPlayer();
+			final Player player = ep.getUser().getPlayer();
 			
 			if (getItemPrice(guiItem) > ep.getCash()) {
 				player.sendMessage(lang.getColoredMessage(ep.getUser().getLanguage(), "notenoughmoney"));
@@ -441,7 +439,7 @@ public class Shop implements Serializable {
 				return;
 			}
 			
-			BankAccount shop = Economy.getInstance().getAccount(getOwner());
+			final BankAccount shop = Economy.getInstance().getAccount(getOwner());
 			
 			if (!player.getInventory().contains(guiItem.getType())) {
 				player.sendMessage(lang.getColoredMessage(ep.getUser().getLanguage(), "shop_sellitem_noitem"));
@@ -468,7 +466,7 @@ public class Shop implements Serializable {
 			if (!getGuiItems().containsKey(guiItem)) return;
 			if (!isDistributionAllowed()) return;
 			
-			Player player = acc.getUser().getPlayer();
+			final Player player = acc.getUser().getPlayer();
 			
 			if (getItemPrice(guiItem) > acc.getBalance()) {
 				player.sendMessage(lang.getColoredMessage(acc.getUser().getLanguage(), "notenoughmoney"));
@@ -480,7 +478,7 @@ public class Shop implements Serializable {
 				return;
 			}
 			
-			BankAccount shop = Economy.getInstance().getAccount(getOwner());
+			final BankAccount shop = Economy.getInstance().getAccount(getOwner());
 			
 			if (!player.getInventory().contains(guiItem.getType())) {
 				player.sendMessage(lang.getColoredMessage(acc.getUser().getLanguage(), "shop_sellitem_noitem"));
@@ -537,7 +535,7 @@ public class Shop implements Serializable {
 			invSize = 54; // max inventory size
 		}
 		
-		List<ItemStack> tempContent = new ArrayList<>();
+		final List<ItemStack> tempContent = new ArrayList<>();
 		
 		for (EdgeItemStack stack : getGuiItems().keySet()) {
 			if (stack != null) tempContent.add(stack.toBukkitItemStack());

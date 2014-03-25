@@ -15,16 +15,17 @@ import org.bukkit.entity.Player;
 
 public class EventCommand extends AbstractCommand {
 	
-	private final CuboidHandler cuboidHandler = CuboidHandler.getInstance();
+	private final static CuboidHandler cuboidHandler = CuboidHandler.getInstance();
 	
 	private static final EventCommand instance = new EventCommand();
 	
-	private EventCommand() { super(); }
+	private EventCommand() { /* ... */ }
 	
 	public static final EventCommand getInstance() {
 		return instance;
 	}
 	
+	// wtf?
 	@Override
 	public Level getLevel() {
 		return Level.valueOf(EdgeCuboid.getInstance().getConfig().getString("Command.event"));
@@ -32,19 +33,16 @@ public class EventCommand extends AbstractCommand {
 	
 	@Override
 	public String[] getNames() {
-		String[] names = { "event" };
-		return names;
+		return new String[]{ "event" };
 	}
 	
 	@Override
 	public boolean validArgsRange(String[] args) {
-		return (args.length > 1 && args.length < 5);
+		return ( args.length > 1 && args.length < 5 );
 	}
 	
 	@Override
 	public void sendUsageImpl(CommandSender sender) {
-		if (!(sender instanceof Player)) return;
-		
 		sender.sendMessage(EdgeCore.usageColor + "/event toggle <cuboid> <event>");
 		sender.sendMessage(EdgeCore.usageColor + "/event status <cuboid> [<event>]");
 		sender.sendMessage(EdgeCore.usageColor + "/event list");	
@@ -53,7 +51,7 @@ public class EventCommand extends AbstractCommand {
 	@Override
 	public boolean runImpl(Player player, User user, String[] args) throws Exception {
 		
-		String userLang = user.getLanguage();
+		final String userLang = user.getLanguage();
 		
 		if (args[1].equalsIgnoreCase("toggle")) {
 			if (args.length != 4) {
@@ -61,33 +59,31 @@ public class EventCommand extends AbstractCommand {
 				return true;
 			}
 			
-			Cuboid cuboid = cuboidHandler.getCuboid(args[2]);
+			final Cuboid cuboid = cuboidHandler.getCuboid( args[2] );
 			
 			if (cuboid == null) {
 				player.sendMessage(lang.getColoredMessage(userLang, "unknowncuboid").replace("[0]", args[2]));
 				return true;
 			}
 			
-			CuboidEvent event = CuboidEvent.valueOf(args[3]);
+			final CuboidEvent event = CuboidEvent.valueOf( args[3] );
 			
-			if (CuboidEvent.hasEvent(cuboid, event)) {
+			if( CuboidEvent.hasEvent( cuboid, event ) ) {
 				
-				CuboidEvent.disableEvent(cuboid, event);
+				CuboidEvent.disableEvent( cuboid, event );
 				player.sendMessage(lang.getColoredMessage(userLang, "event_toggle_false").replace("[0]", event.name()));
 				
 			} else {
-				
 				CuboidEvent.enableEvent(cuboid, event);
 				player.sendMessage(lang.getColoredMessage(userLang, "event_toggle_true").replace("[0]", event.name()));
 				
 			}
-			
 			return true;
 		}
 		
-		if (args[1].equalsIgnoreCase("status")) {
+		if ( args[1].equalsIgnoreCase( "status" ) ) {
 			
-			Cuboid cuboid = cuboidHandler.getCuboid(args[2]);
+			final Cuboid cuboid = cuboidHandler.getCuboid( args[2] );
 			
 			if (cuboid == null) {
 				player.sendMessage(lang.getColoredMessage(userLang, "unknowncuboid").replace("[0]", args[2]));
@@ -96,14 +92,14 @@ public class EventCommand extends AbstractCommand {
 			
 			if (args.length == 3) {
 				
-				StringBuilder sb = new StringBuilder();
+				final StringBuilder sb = new StringBuilder();
 				
-				for (CuboidEvent event : CuboidEvent.getCuboidEvents()) {
+				for ( CuboidEvent event : CuboidEvent.getCuboidEvents() ) {
 					if (sb.length() > 0)
 						sb.append(ChatColor.WHITE + ", ");
 					
-					sb.append(CuboidEvent.hasEvent(cuboid, event) ? ChatColor.GREEN : ChatColor.RED);
-					sb.append(event.name());
+					sb.append( CuboidEvent.hasEvent(cuboid, event) ? ChatColor.GREEN : ChatColor.RED );
+					sb.append( event.name() );
 				}
 				
 				player.sendMessage(lang.getColoredMessage(userLang, "event_status_all").replace("[0]", cuboid.getName()).replace("[1]", sb.toString()));
@@ -113,8 +109,8 @@ public class EventCommand extends AbstractCommand {
 			
 			if (args.length == 4) {
 				
-				CuboidEvent event = CuboidEvent.valueOf(args[3]);
-				String msg = CuboidEvent.hasEvent(cuboid, event) 
+				final CuboidEvent event = CuboidEvent.valueOf(args[3]);
+				final String msg = CuboidEvent.hasEvent(cuboid, event) 
 								? lang.getColoredMessage(userLang, "event_status_event_true").replace("[0]", args[3]) 
 								: lang.getColoredMessage(userLang, "event_status_event_false").replace("[0]", args[3]);
 				
@@ -124,9 +120,9 @@ public class EventCommand extends AbstractCommand {
 			}
 		}
 		
-		if (args[1].equalsIgnoreCase("list")) {
+		if ( args[1].equalsIgnoreCase( "list" ) ) {
 			
-			StringBuilder sb = new StringBuilder();
+			final StringBuilder sb = new StringBuilder();
 			
 			for (CuboidEvent event : CuboidEvent.getCuboidEvents()) {
 				if (sb.length() > 0)
@@ -140,11 +136,6 @@ public class EventCommand extends AbstractCommand {
 			return true;
 		}
 		
-		return true;
-	}
-	
-	@Override
-	public boolean sysAccess(CommandSender sender, String[] args) {
 		return true;
 	}
 }

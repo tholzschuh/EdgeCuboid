@@ -1,7 +1,6 @@
 package net.edgecraft.edgecuboid.commands;
 
 import net.edgecraft.edgecore.EdgeCore;
-import net.edgecraft.edgecore.EdgeCoreAPI;
 import net.edgecraft.edgecore.command.AbstractCommand;
 import net.edgecraft.edgecore.command.Level;
 import net.edgecraft.edgecore.user.User;
@@ -16,16 +15,17 @@ import org.bukkit.entity.Player;
 
 public class FlagCommand extends AbstractCommand {
 	
-	private final CuboidHandler cuboidHandler = CuboidHandler.getInstance();
+	private final static CuboidHandler cuboidHandler = CuboidHandler.getInstance();
 	
 	private static final FlagCommand instance = new FlagCommand();
 	
-	private FlagCommand() { super(); }
+	private FlagCommand() { /* ... */ }
 	
 	public static final FlagCommand getInstance() {
 		return instance;
 	}
 	
+	// wtf?
 	@Override
 	public Level getLevel() {
 		return Level.valueOf(EdgeCuboid.getInstance().getConfig().getString("Command.flag"));
@@ -33,28 +33,25 @@ public class FlagCommand extends AbstractCommand {
 	
 	@Override
 	public String[] getNames() {
-		String[] names = { "flag" };
-		return names;
+		return new String[]{ "flag" };
 	}
 	
 	@Override
 	public boolean validArgsRange(String[] args) {
-		return (args.length > 1 && args.length < 6);
+		return ( args.length == 2 || args.length == 4 || args.length == 5 );
 	}
 	
 	@Override
 	public void sendUsageImpl(CommandSender sender) {
-		if (!(sender instanceof Player)) return;
-		
 		sender.sendMessage(EdgeCore.usageColor + "/flag toggle <cuboid> <user> <flag>");
 		sender.sendMessage(EdgeCore.usageColor + "/flag check <cuboid> <user>");
 		sender.sendMessage(EdgeCore.usageColor + "/flag list");	
 	}
 	
 	@Override
-	public boolean runImpl(Player player, User user, String[] args) throws Exception {
+	public boolean runImpl(Player player, User user, String[] args) {
 		
-		String userLang = user.getLanguage();
+		final String userLang = user.getLanguage();
 		
 		if (args[1].equalsIgnoreCase("toggle")) {
 			if (args.length != 5) {
@@ -62,8 +59,8 @@ public class FlagCommand extends AbstractCommand {
 				return true;
 			}
 			
-			Cuboid cuboid = cuboidHandler.getCuboid(args[2]);
-			User flagUser = EdgeCoreAPI.userAPI().getUser(args[3]);
+			final Cuboid cuboid = cuboidHandler.getCuboid(args[2]);
+			final User flagUser = users.getUser(args[3]);
 			
 			if (cuboid == null) {
 				player.sendMessage(lang.getColoredMessage(userLang, "unknowncuboid").replace("[0]", args[2]));
@@ -75,9 +72,9 @@ public class FlagCommand extends AbstractCommand {
 				return true;
 			}
 			
-			Flag flag = Flag.valueOf(args[4]);
+			final Flag flag = Flag.valueOf( args[4] );
 			
-			if (Flag.hasFlag(cuboid, flag, flagUser.getName())) {
+			if ( Flag.hasFlag(cuboid, flag, flagUser.getName() ) ) {
 				
 				Flag.removeFlag(cuboid, flagUser.getName(), flag);
 				player.sendMessage(lang.getColoredMessage(userLang, "flag_toggle_false").replace("[0]", flagUser.getName()).replace("[1]", flag.name()));
@@ -92,26 +89,26 @@ public class FlagCommand extends AbstractCommand {
 			return true;
 		}
 		
-		if (args[1].equalsIgnoreCase("check")) {
+		if ( args[1].equalsIgnoreCase( "check" ) ) {
 			if (args.length != 4) {
 				sendUsage(player);
 				return true;
 			}
 			
-			Cuboid cuboid = cuboidHandler.getCuboid(args[2]);
-			User flagUser = EdgeCoreAPI.userAPI().getUser(args[3]);
+			final Cuboid cuboid = cuboidHandler.getCuboid(args[2]);
+			final User flagUser = users.getUser(args[3]);
 			
-			if (cuboid == null) {
+			if ( cuboid == null ) {
 				player.sendMessage(lang.getColoredMessage(userLang, "unknowncuboid").replace("[0]", args[2]));
 				return true;
 			}
 			
-			if (flagUser == null) {
+			if ( flagUser == null ) {
 				player.sendMessage(lang.getColoredMessage(userLang, "notfound"));
 				return true;
 			}
 			
-			StringBuilder sb = new StringBuilder();
+			final StringBuilder sb = new StringBuilder();
 			
 			for (Flag flag : Flag.getFlags()) {
 				if (Flag.hasFlag(cuboid, flag, flagUser.getName())) {
@@ -122,15 +119,14 @@ public class FlagCommand extends AbstractCommand {
 					sb.append(ChatColor.GOLD + flag.name());
 				}
 			}
-			
 			player.sendMessage(lang.getColoredMessage(userLang, "flag_check").replace("[0]", flagUser.getName()).replace("[1]", sb.toString()));
 			
 			return true;
 		}
 		
-		if (args[1].equalsIgnoreCase("list")) {
+		if( args[1].equalsIgnoreCase( "list" ) ) {
 			
-			StringBuilder sb = new StringBuilder();
+			final StringBuilder sb = new StringBuilder();
 			
 			for (Flag flag : Flag.getFlags()) {
 				if (sb.length() > 0)
@@ -144,11 +140,6 @@ public class FlagCommand extends AbstractCommand {
 			return true;
 		}
 		
-		return true;
-	}
-	
-	@Override
-	public boolean sysAccess(CommandSender sender, String[] args) {
 		return true;
 	}
 }

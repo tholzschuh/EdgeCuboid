@@ -21,14 +21,14 @@ import org.bukkit.entity.Player;
 
 public class ShopHandler {
 	
-	public static String shopTable = "edgecuboid_shops";
+	public final static String shopTable = "edgecuboid_shops";
+	private static final DatabaseHandler db = EdgeCoreAPI.databaseAPI();
 	
-	private Map<Integer, Shop> shops = new LinkedHashMap<>();
+	private final Map<Integer, Shop> shops = new LinkedHashMap<>();
 	private static List<Material> frames;
 	private static boolean looseInvOnDeath;
 	
 	private static final ShopHandler instance = new ShopHandler();
-	private final DatabaseHandler db = EdgeCoreAPI.databaseAPI();
 	
 	protected ShopHandler() { /* Singleton */ }	
 	
@@ -45,7 +45,8 @@ public class ShopHandler {
 	}
 	
 	public List<Shop> getNearShops(Player p, double distance) {
-		List<Shop> nearShops = new ArrayList<>();
+		
+		final List<Shop> nearShops = new ArrayList<>();
 		
 		for (Shop shop : getShops().values()) {
 			
@@ -58,7 +59,8 @@ public class ShopHandler {
 	}
 	
 	public List<Shop> getProvidingShops(Player p, EdgeItemStack item, double distance) {
-		List<Shop> providingShops = new ArrayList<>();
+
+		final List<Shop> providingShops = new ArrayList<>();
 		
 		for (Shop shop : getShops().values()) {
 			if (shop.getGuiItems().containsKey(item)) {
@@ -77,7 +79,7 @@ public class ShopHandler {
 	}
 	
 	public static void setShopFrames(List<String> frames) {
-		List<Material> material = new ArrayList<>();
+		final List<Material> material = new ArrayList<>();
 		
 		for (String s : frames) {
 			if (s != null)
@@ -98,11 +100,10 @@ public class ShopHandler {
 	public void registerShop(Cuboid c, ShopType type, String owner, double price, boolean buyable, double rental, boolean rentable, Map<EdgeItemStack, Double> guiItems, double income, boolean distribution) {		
 		try {
 			
-			Shop shop = new Shop(c, type, owner, price, buyable, rental, rentable, guiItems, income, distribution);
-			byte[] shopByteArray = shop.toByteArray();
-			Blob blob = new SerialBlob(shopByteArray);
+			final Shop shop = new Shop(c, type, owner, price, buyable, rental, rentable, guiItems, income, distribution);
+			final Blob blob = new SerialBlob( shop.toByteArray() );
 			
-			PreparedStatement registerShop = db.prepareUpdate("INSERT INTO " + ShopHandler.shopTable + " (cuboidid, shop) VALUES (?, ?);");
+			final PreparedStatement registerShop = db.prepareUpdate("INSERT INTO " + ShopHandler.shopTable + " (cuboidid, shop) VALUES (?, ?);");
 			registerShop.setInt(1, c.getID());
 			registerShop.setBlob(2, blob);
 			registerShop.executeUpdate();
@@ -120,7 +121,7 @@ public class ShopHandler {
 		
 		try {
 			
-			PreparedStatement deleteShop = db.prepareUpdate("DELETE FROM " + ShopHandler.shopTable + " WHERE cuboidid = '" + id + "';");
+			final PreparedStatement deleteShop = db.prepareUpdate("DELETE FROM " + ShopHandler.shopTable + " WHERE cuboidid = '" + id + "';");
 			deleteShop.executeUpdate();
 			
 			getShops().remove(id);
@@ -137,7 +138,7 @@ public class ShopHandler {
 	}
 	
 	public int greatestID() throws Exception {
-		List<Map<String, Object>> tempVar = db.getResults("SELECT COUNT(cuboidid) AS amount FROM " + ShopHandler.shopTable);
+		final List<Map<String, Object>> tempVar = db.getResults("SELECT COUNT(cuboidid) AS amount FROM " + ShopHandler.shopTable);
 		int tempID = Integer.parseInt(String.valueOf(tempVar.get(0).get("amount")));
 		
 		if (tempID <= 0) return 1;
@@ -208,24 +209,24 @@ public class ShopHandler {
 	public void synchronizeShop(int id) {
 		try {
 			
-			List<Map<String, Object>> results = db.getResults("SELECT * FROM " + ShopHandler.shopTable + " WHERE cuboidid = '" + id + "';");
+			final List<Map<String, Object>> results = db.getResults("SELECT * FROM " + ShopHandler.shopTable + " WHERE cuboidid = '" + id + "';");
 			
 			if (results.isEmpty()) {
 				EdgeCuboid.log.info(EdgeCuboid.cuboidbanner + "No Synchronizable Shop Entries Found! Cancelling synchronization..");
 				return;
 			}
 			
-			byte[] byteToShop = (byte[]) results.get(0).get("shop");
+			final byte[] byteToShop = (byte[]) results.get(0).get("shop");
 			
-			Shop shop = Shop.toShop(byteToShop);
+			final Shop shop = Shop.toShop(byteToShop);
 			
 			if (getShop(shop.getCuboidID()) != null) {
 				Shop s = shop;
 					
 				if (!s.equals(shop)) {
 					
-					PreparedStatement updateShop = db.prepareUpdate("UPDATE " + ShopHandler.shopTable + " SET cuboidid = ?, shop = ?;");
-					Blob blob = new SerialBlob(s.toByteArray());
+					final PreparedStatement updateShop = db.prepareUpdate("UPDATE " + ShopHandler.shopTable + " SET cuboidid = ?, shop = ?;");
+					final Blob blob = new SerialBlob(s.toByteArray());
 					
 					updateShop.setInt(1, s.getCuboidID());
 					updateShop.setBlob(2, blob);

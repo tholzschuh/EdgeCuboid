@@ -17,12 +17,13 @@ public class CFindCommand extends AbstractCommand {
 	
 	private static final CFindCommand instance = new CFindCommand();
 	
-	private CFindCommand() { super(); }
+	private CFindCommand() { /* ... */ }
 	
 	public static final CFindCommand getInstance() {
 		return instance;
 	}
 	
+	// wtf?
 	@Override
 	public Level getLevel() {
 		return Level.valueOf(EdgeCuboid.getInstance().getConfig().getString("Command.cfind"));
@@ -30,28 +31,25 @@ public class CFindCommand extends AbstractCommand {
 	
 	@Override
 	public String[] getNames() {
-		String[] names = { "cfind" };
-		return names;
+		return new String[]{ "cfind" };
 	}
 	
 	@Override
 	public boolean validArgsRange(String[] args) {
-		return args.length == 1;
+		return ( args.length == 1 );
 	}
 	
 	@Override
 	public  void sendUsageImpl(CommandSender sender) {
-		if (!(sender instanceof Player)) return;
-		
 		sender.sendMessage(EdgeCore.usageColor + "/cfind");
 	}
 	
 	@Override
 	public boolean runImpl(Player player, User user, String[] args) throws Exception {
 		
-		String userLang = user.getLanguage();
+		final String userLang = user.getLanguage();
 		
-		if (cuboidHandler.isSearching(player.getName())) {
+		if (cuboidHandler.isSearching( player.getName() ) ) {
 			player.sendMessage(lang.getColoredMessage(userLang, "cuboid_find_stop"));
 			cuboidHandler.getSearchingPlayers().remove(player.getName());
 			
@@ -61,11 +59,6 @@ public class CFindCommand extends AbstractCommand {
 		player.sendMessage(lang.getColoredMessage(userLang, "cuboid_find_start").replace("[0]", WorldManager.getInstance().getFindItem().name()));
 		cuboidHandler.getSearchingPlayers().add(player.getName());
 		
-		return true;
-	}
-	
-	@Override
-	public boolean sysAccess(CommandSender sender, String[] args) {
 		return true;
 	}
 }

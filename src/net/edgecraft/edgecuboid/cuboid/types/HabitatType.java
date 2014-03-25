@@ -3,7 +3,7 @@ package net.edgecraft.edgecuboid.cuboid.types;
 public enum HabitatType {
 	
 	House(0),
-	Aparment(1),
+	Apartment(1),
 	Skyscraper(2),
 	Hotelroom(3),
 	Loft(4),
@@ -21,7 +21,7 @@ public enum HabitatType {
 	
 	public static HabitatType[] getHabitatTypes() {
 		
-		HabitatType[] types = { HabitatType.House, HabitatType.Aparment, HabitatType.Skyscraper, HabitatType.Hotelroom, HabitatType.Loft, HabitatType.Villa };
+		HabitatType[] types = { HabitatType.House, HabitatType.Apartment, HabitatType.Skyscraper, HabitatType.Hotelroom, HabitatType.Loft, HabitatType.Villa };
 		return types;
 		
 	}

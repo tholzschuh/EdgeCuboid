@@ -18,6 +18,7 @@ import net.edgecraft.edgecuboid.shop.ShopHandler;
 import net.edgecraft.edgecuboid.world.HandleWorldEvents;
 import net.edgecraft.edgecuboid.world.WorldManager;
 
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -31,7 +32,7 @@ public class EdgeCuboid extends JavaPlugin {
 	private static final CuboidHandler cuboidAPI = CuboidHandler.getInstance();
 	private static final WorldManager worldAPI = WorldManager.getInstance();
 	private static final ShopHandler shopAPI = ShopHandler.getInstance();
-	private final CommandHandler commands = EdgeCoreAPI.commandsAPI();
+	private static final CommandHandler commands = EdgeCoreAPI.commandsAPI();
 	private final ConfigHandler config = ConfigHandler.getInstance(this);
 	
 	private static boolean eventTaskReady = true;
@@ -40,7 +41,7 @@ public class EdgeCuboid extends JavaPlugin {
 	 * Is used when the plugin is going to shut down
 	 */
 	public void onDisable() {
-		cuboidAPI.synchronizeCuboidManagement(true, true);
+		cuboidAPI.synchronizeCuboidManagement( true, true );
 		log.info(cuboidbanner + "Plugin wurde erfolgreich beendet!");
 	}
 	
@@ -58,8 +59,8 @@ public class EdgeCuboid extends JavaPlugin {
 	public void onLoad() {
 		instance = this;
 		
-		this.config.loadConfig();
-		this.config.update();
+		config.loadConfig();
+		config.update();
 		
 		shopAPI.synchronizeShops();
 	}
@@ -68,15 +69,18 @@ public class EdgeCuboid extends JavaPlugin {
 	 * Registers data the plugin will use
 	 */
 	private void registerData() {
-		getServer().getPluginManager().registerEvents(new HandleCuboidEvents(), this);
-		getServer().getPluginManager().registerEvents(new HandleWorldEvents(), this);
-		getServer().getPluginManager().registerEvents(new HandleCuboidFlags(), this);
-		getServer().getPluginManager().registerEvents(new HandleCommandEvents(), this);
 		
-		commands.registerCommand( new CommandCollection(CuboidCommands.getInstance()) );
+		final PluginManager manager = getServer().getPluginManager();
 		
-		@SuppressWarnings("unused") BukkitTask eventTask = new EventTask().runTaskTimer(this, 0L, 20L);
-		@SuppressWarnings("unused") BukkitTask syncTask = new CuboidSynchronizationTask().runTaskTimer(this, 0, 20L * 60 * 10);
+		manager.registerEvents( new HandleCuboidEvents(), this );
+		manager.registerEvents( new HandleWorldEvents(), this );
+		manager.registerEvents( new HandleCuboidFlags(), this );
+		manager.registerEvents( new HandleCommandEvents(), this) ;
+		
+		commands.registerCommand( new CommandCollection( CuboidCommands.getInstance() ) );
+		
+		@SuppressWarnings("unused") final BukkitTask eventTask = new EventTask().runTaskTimer( this, 0L, 20L );
+		@SuppressWarnings("unused") final BukkitTask syncTask = new CuboidSynchronizationTask().runTaskTimer( this, 0, 20L * 60 * 10 );
 	}
 	
 	/**

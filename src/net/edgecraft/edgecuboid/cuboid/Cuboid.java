@@ -89,11 +89,10 @@ public class Cuboid implements Serializable {
 	public static Cuboid toCuboid(byte[] byteArray) {
 		try {
 			
-			ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArray);
-			ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+			final ObjectInputStream input = new ObjectInputStream( new ByteArrayInputStream( byteArray ) );
 			
 			@SuppressWarnings("unchecked")
-			Map<String, Object> infoMap = (Map<String, Object>) objectInputStream.readObject();
+			final Map<String, Object> infoMap = (Map<String, Object>) input.readObject();
 			
 			Cuboid cuboid = new Cuboid();
 			cuboid.deserialize(infoMap);
@@ -107,17 +106,32 @@ public class Cuboid implements Serializable {
 	}
 	
 	/**
+	 * Returns the cuboid the given player is currently in
+	 * @param p
+	 * @return Cuboid
+	 */
+	public static Cuboid getCuboid( Location loc ) {	
+		
+		for ( Cuboid c : CuboidHandler.getInstance().getCuboids().values() ) {
+			if( c.isInside( loc ) )
+				return c;
+		}
+		
+		return null;
+	}
+	
+	/**
 	 * Writes this cuboid instance into a byte[]
 	 * @return byte[]
 	 */
 	public byte[] toByteArray() {
+		
 		try {
 			
-			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-			ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
-			objectOutputStream.writeObject(this.serialize());
+			final ByteArrayOutputStream out = new ByteArrayOutputStream();
+			new ObjectOutputStream( out ).writeObject( this.serialize() );
 			
-			return byteArrayOutputStream.toByteArray();
+			return out.toByteArray();
 			
 		} catch (Exception exc) {
 			exc.printStackTrace();
@@ -130,7 +144,7 @@ public class Cuboid implements Serializable {
 	 * @return Map<String, Object>
 	 */
 	private Map<String, Object> serialize() {
-		Map<String, Object> infoMap = new LinkedHashMap<String, Object>();		
+		final Map<String, Object> infoMap = new LinkedHashMap<String, Object>();		
 		infoMap.put("object-type", "Cuboid");
 		
 		// Put information
@@ -173,20 +187,21 @@ public class Cuboid implements Serializable {
 	 */
 	@SuppressWarnings("unchecked")
 	private void deserialize(Map<String, Object> infoMap) {		
-		if (!infoMap.containsKey("object-type") || !infoMap.get("object-type").equals("Cuboid")) throw new java.util.UnknownFormatFlagsException("No Cuboid");
 		
-		setID((int) infoMap.get("id"));
-		setName((String) infoMap.get("name"));
-		setOwnerID((int) infoMap.get("owner-id"));
-		setCuboidType(CuboidType.getType((int) infoMap.get("cuboid-type")));
-		setModifyLevel(Level.getInstance((int) infoMap.get("modifylevel")));
+		if ( !infoMap.containsKey("object-type") || !infoMap.get("object-type").equals("Cuboid") ) throw new java.util.UnknownFormatFlagsException("No Cuboid");
 		
-		Location spawn = new Location(((World) Bukkit.getWorld((String) infoMap.get("world"))), 
+		setID( (int) infoMap.get("id") );
+		setName( (String) infoMap.get("name") );
+		setOwnerID( (int) infoMap.get("owner-id") );
+		setCuboidType( CuboidType.getType( (int) infoMap.get("cuboid-type") ) );
+		setModifyLevel( Level.getInstance( (int) infoMap.get("modifylevel") ) );
+		
+		final Location spawn = new Location(((World) Bukkit.getWorld((String) infoMap.get("world"))), 
 										(int) infoMap.get("spawn-x"), (int) infoMap.get("spawn-y"), (int) infoMap.get("spawn-z"), 
 										(float) infoMap.get("spawn-yaw"), (float) infoMap.get("spawn-pitch"));
 		
-		Location min = new Location(((World) Bukkit.getWorld((String) infoMap.get("world"))), (int) infoMap.get("minlocation-x"), (int) infoMap.get("minlocation-y"), (int) infoMap.get("minlocation-z"));
-		Location max = new Location(((World) Bukkit.getWorld((String) infoMap.get("world"))), (int) infoMap.get("maxlocation-x"), (int) infoMap.get("maxlocation-y"), (int) infoMap.get("maxlocation-z"));
+		final Location min = new Location(((World) Bukkit.getWorld((String) infoMap.get("world"))), (int) infoMap.get("minlocation-x"), (int) infoMap.get("minlocation-y"), (int) infoMap.get("minlocation-z"));
+		final Location max = new Location(((World) Bukkit.getWorld((String) infoMap.get("world"))), (int) infoMap.get("maxlocation-x"), (int) infoMap.get("maxlocation-y"), (int) infoMap.get("maxlocation-z"));
 		
 		setSpawnLocation(spawn);
 		setMinLocation(min);
@@ -289,16 +304,16 @@ public class Cuboid implements Serializable {
 	 * @return String
 	 */
 	public String getEventList() {
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		
-		for (CuboidEvent e : CuboidEvent.values()) {
+		for ( CuboidEvent e : CuboidEvent.values() ) {
 			if (sb.length() > 0) {
 				sb.append(ChatColor.RED);
 				sb.append(",");
 			}
 			
-			sb.append(hasEvent (e) ? ChatColor.GREEN : ChatColor.RED);
-			sb.append(e.name());
+			sb.append( hasEvent(e) ? ChatColor.GREEN : ChatColor.RED);
+			sb.append( e.name() );
 		}
 		
 		return sb.toString();
@@ -309,7 +324,7 @@ public class Cuboid implements Serializable {
 	 * @param event
 	 * @return true/false
 	 */
-	public boolean hasEvent(CuboidEvent event) {
+	public boolean hasEvent( CuboidEvent event ) {
 		return CuboidEvent.hasEvent(this, event);
 	}
 	
@@ -334,13 +349,14 @@ public class Cuboid implements Serializable {
 	 * @return String
 	 */
 	public String getCommands() {
-		StringBuilder sb = new StringBuilder();
+		
+		final StringBuilder sb = new StringBuilder();
 		
 		for (int i = 0; i < getAllowedCommands().size(); i++) {
 			if (sb.length() > 0)
-				sb.append(",");
+				sb.append( "," );
 			
-			sb.append(getAllowedCommands().get(i));
+			sb.append( getAllowedCommands().get( i ) );
 		}
 		
 		return sb.toString();
@@ -350,28 +366,26 @@ public class Cuboid implements Serializable {
 	 * Allows the given command
 	 * @param cmd
 	 */
-	public void allowCommand(String cmd) {
-		if (cmd == null || getAllowedCommands().contains(cmd)) return;
-		
-		getAllowedCommands().add(cmd);
+	public void allowCommand( String cmd ) {
+		if ( cmd == null || getAllowedCommands().contains( cmd ) ) return;
+		 
+		getAllowedCommands().add( cmd );
 	}
 	
 	/**
 	 * Allows the given command
 	 * @param cmd
 	 */
-	public void allowCommand(AbstractCommand cmd) {
-		if (cmd == null || getAllowedCommands().contains(cmd.getName())) return;
-		
-		getAllowedCommands().add(cmd.getName());
+	public void allowCommand( AbstractCommand cmd ) {
+		allowCommand( cmd.getName() );
 	}
 	
 	/**
 	 * Disallows the given command
 	 * @param cmd
 	 */
-	public void disallowCommand(String cmd) {
-		if (cmd == null || !getAllowedCommands().contains(cmd)) return;
+	public void disallowCommand( String cmd ) {
+		if ( cmd == null || !getAllowedCommands().contains( cmd ) ) return;
 		
 		getAllowedCommands().remove(cmd);
 	}
@@ -380,10 +394,8 @@ public class Cuboid implements Serializable {
 	 * Disallows the given command
 	 * @param cmd
 	 */
-	public void disallowCommand(AbstractCommand cmd) {
-		if (cmd == null || !getAllowedCommands().contains(cmd.getName())) return;
-		
-		getAllowedCommands().remove(cmd.getName());
+	public void disallowCommand( AbstractCommand cmd ) {
+			disallowCommand( cmd.getName() );
 	}
 	
 	/**
@@ -391,7 +403,7 @@ public class Cuboid implements Serializable {
 	 * @param cmd
 	 * @return true/false
 	 */
-	public boolean isCommandAllowed(String cmd) {
+	public boolean isCommandAllowed( String cmd ) {
 		return getAllowedCommands().contains(cmd);
 	}
 	
@@ -401,7 +413,7 @@ public class Cuboid implements Serializable {
 	 * @return true/false
 	 */
 	public boolean isCommandAllowed(AbstractCommand cmd) {
-		return getAllowedCommands().contains(cmd.getName());
+		return isCommandAllowed( cmd.getName() );
 	}
 	
 	/**
@@ -425,14 +437,15 @@ public class Cuboid implements Serializable {
 	 * Recalculates the center location of the cuboid
 	 */
 	public void calculateCenter() {
-		int x1 = getMaxLocation().getBlockX() + 1;
-		int y1 = getSizeY();
-		int z1 = getMaxLocation().getBlockZ() + 1;
-		Location center = new Location(getMinLocation().getWorld(), getMinLocation().getBlockX() + (x1 - getMinLocation().getBlockX()) / 2.0D,
+		
+		final int x1 = getMaxLocation().getBlockX() + 1;
+		final int y1 = getSizeY();
+		final int z1 = getMaxLocation().getBlockZ() + 1;
+		final Location center = new Location(getMinLocation().getWorld(), getMinLocation().getBlockX() + (x1 - getMinLocation().getBlockX()) / 2.0D,
 																	getMinLocation().getBlockY() + (y1 - getMinLocation().getBlockY()) / 2.0D,
 																	getMinLocation().getBlockZ() + (z1 - getMinLocation().getBlockZ()) / 2.0D);
 		
-		setCenter(center);
+		setCenter( center );
 	}
 	
 	/**
@@ -440,17 +453,18 @@ public class Cuboid implements Serializable {
 	 * @param loc
 	 * @return true/false
 	 */
-	public boolean isInside(Location loc) {
-		if (!loc.getWorld().getName().equals(getWorld())) return false;
+	public boolean isInside( Location loc ) {
+		if ( !loc.getWorld().getName().equals(getWorld() ) ) return false;
 		
-		int minX = Math.min(minLocation.getBlockX(), maxLocation.getBlockX());
-		int minY = Math.min(minLocation.getBlockY(), maxLocation.getBlockY());
-		int minZ = Math.min(minLocation.getBlockZ(), maxLocation.getBlockZ());
-		int maxX = Math.max(minLocation.getBlockX(), maxLocation.getBlockX());
-		int maxY = Math.max(minLocation.getBlockY(), maxLocation.getBlockY());
-		int maxZ = Math.max(minLocation.getBlockZ(), maxLocation.getBlockZ());
+		final int minX = Math.min( minLocation.getBlockX(), maxLocation.getBlockX() );
+		final int minY = Math.min( minLocation.getBlockY(), maxLocation.getBlockY() );
+		final int minZ = Math.min( minLocation.getBlockZ(), maxLocation.getBlockZ() );
 		
-		if ((loc.getBlockX() >= minX) && (loc.getBlockX() <= maxX)
+		final int maxX = Math.max( minLocation.getBlockX(), maxLocation.getBlockX() );
+		final int maxY = Math.max( minLocation.getBlockY(), maxLocation.getBlockY() );
+		final int maxZ = Math.max( minLocation.getBlockZ(), maxLocation.getBlockZ() );
+		
+		if ( (loc.getBlockX() >= minX) && (loc.getBlockX() <= maxX )
 			&& (loc.getBlockY() >= minY) && (loc.getBlockY() <= maxY)
 			&& (loc.getBlockZ() >= minZ) && (loc.getBlockZ() <= maxZ)) {
 			
@@ -458,22 +472,6 @@ public class Cuboid implements Serializable {
 		}
 		
 		return false;
-	}
-
-	/**
-	 * Returns the cuboid the given player is currently in
-	 * @param p
-	 * @return Cuboid
-	 */
-	public static Cuboid getCuboid(Location loc) {		
-		for (Cuboid c : CuboidHandler.getInstance().getCuboids().values()) {
-			
-			if (c.isInside(loc)) {
-				return c;
-			}
-		}
-		
-		return null;
 	}
 	
 	/**
@@ -544,7 +542,7 @@ public class Cuboid implements Serializable {
 	 * Recalculates the 2D-Area of the cuboid using X*Z
 	 */
 	public void calculateArea() {
-		setArea(getSizeX() * getSizeZ());
+		setArea( getSizeX() * getSizeZ() );
 	}
 
 	/**
@@ -559,7 +557,7 @@ public class Cuboid implements Serializable {
 	 * Recalculates the cuboids' volume using X*Y*Z
 	 */
 	public void calculateVolume() {
-		setVolume(getSizeX() * getSizeY() * getSizeZ());
+		setVolume( getSizeX() * getSizeY() * getSizeZ() );
 	}
 
 	/**
@@ -582,8 +580,8 @@ public class Cuboid implements Serializable {
 	 * Sets the cuboids' name
 	 * @param name
 	 */
-	public void setName(String name) {
-		if (name != null)
+	public void setName( String name ) {
+		if ( name != null && name.trim().length() > 0 )
 			this.name = name;
 	}
 
@@ -591,7 +589,7 @@ public class Cuboid implements Serializable {
 	 * Sets the cuboids' ID
 	 * @param id
 	 */
-	protected void setID(int id) {
+	protected void setID( int id ) {
 		if (id >= 0)
 			this.id = id;
 	}
@@ -600,7 +598,7 @@ public class Cuboid implements Serializable {
 	 * Switches the cuboids' owner
 	 * @param newOwner
 	 */
-	public void switchOwner(int newOwner) {
+	public void switchOwner( int newOwner ) {
 		setOwnerID(newOwner);
 	}
 	
@@ -608,8 +606,8 @@ public class Cuboid implements Serializable {
 	 * Sets the cuboid owners' id
 	 * @param ownerID
 	 */
-	protected void setOwnerID(int ownerID) {
-		if (ownerID > 0)
+	protected void setOwnerID( int ownerID ) {
+		if( ownerID > 0 )
 			this.ownerID = ownerID;
 	}
 	
@@ -617,28 +615,28 @@ public class Cuboid implements Serializable {
 	 * Updates the CuboidType
 	 * @param type
 	 */
-	public void updateCuboidType(CuboidType type) {
-		setCuboidType(type);
+	public void updateCuboidType( CuboidType type ) {
+		setCuboidType( type );
 	}
 	
 	/**
 	 * Sets the cuboids' type
 	 * @param cuboidType
 	 */
-	protected void setCuboidType(CuboidType cuboidType) {
-		if (cuboidType != null) {
+	protected void setCuboidType( CuboidType type ) {
+		
+		if( type == null ) return;
+		
+		if ( getEvents() == null ) events = new ArrayList<CuboidEvent>();
 			
-			if (getEvents() == null) events = new ArrayList<CuboidEvent>();
+		for ( CuboidEvent event : CuboidType.getType( getCuboidType() ).getEventList() ) {
+			if ( CuboidEvent.hasEvent(this, event) ) CuboidEvent.disableEvent( this, event );
+		}
 			
-			for (CuboidEvent event : CuboidType.getType(getCuboidType()).getEventList()) {
-				if (CuboidEvent.hasEvent(this, event)) CuboidEvent.disableEvent(this, event);
-			}
+		this.cuboidType = type.getTypeID();
 			
-			this.cuboidType = cuboidType.getTypeID();
-			
-			for (CuboidEvent event : CuboidType.getType(getCuboidType()).getEventList()) {
-				if (!CuboidEvent.hasEvent(this, event)) CuboidEvent.enableEvent(this, event);
-			}
+		for (CuboidEvent event : CuboidType.getType(getCuboidType()).getEventList()) {
+			if (!CuboidEvent.hasEvent(this, event)) CuboidEvent.enableEvent(this, event);
 		}
 	}
 	
@@ -655,7 +653,7 @@ public class Cuboid implements Serializable {
 	 * -> null sets it to the owners user level
 	 * @param level
 	 */
-	protected void setModifyLevel(Level level) {
+	protected void setModifyLevel( Level level ) {
 		if (level == null)
 			this.modifyLevel = Level.USER;
 		else
@@ -666,7 +664,7 @@ public class Cuboid implements Serializable {
 	 * Sets the cuboids' participants
 	 * @param participants
 	 */
-	protected void setParticipants(List<String> participants) {
+	protected void setParticipants( List<String> participants ) {
 		if (participants == null)
 			this.participants = new ArrayList<String>();
 		else
@@ -677,7 +675,7 @@ public class Cuboid implements Serializable {
 	 * Sets the cuboids' events
 	 * @param events
 	 */
-	protected void setEvents(List<CuboidEvent> events) {
+	protected void setEvents( List<CuboidEvent> events ) {
 		if (events == null)
 			this.events = new ArrayList<CuboidEvent>();
 		else
@@ -688,7 +686,7 @@ public class Cuboid implements Serializable {
 	 * Sets the cuboids' flags
 	 * @param flags
 	 */
-	protected void setFlags(HashMap<Flag, List<String>> flags) {
+	protected void setFlags( HashMap<Flag, List<String>> flags ) {
 		if (flags == null)
 			this.flags = new HashMap<Flag, List<String>>();
 		else
@@ -699,12 +697,12 @@ public class Cuboid implements Serializable {
 	 * Sets the cuboids' allowed commands
 	 * @param cmds
 	 */
-	protected void setCommands(List<String> cmds) {
+	protected void setCommands( List<String> cmds ) {
 		if (cmds == null) {
 			if (commands == null)
 				commands = new ArrayList<String>();
 			
-			for (String s : CommandHandler.getInstance().getCmdList().keySet()) {
+			for ( String s : CommandHandler.getInstance().getCmdList().keySet() ) {
 				if (s != null) {
 					commands.add(s);
 				}

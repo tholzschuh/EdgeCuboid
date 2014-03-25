@@ -24,7 +24,6 @@ public class CuboidCommands extends CommandHandler {
 		super.registerCommand( HabitatCommand.getInstance() );
 		super.registerCommand( HomeCommand.getInstance() );
 		super.registerCommand( ShopCommand.getInstance() );
-		
 	}
 	
 	public static final CuboidCommands getInstance() {

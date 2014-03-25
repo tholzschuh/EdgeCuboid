@@ -21,16 +21,17 @@ import org.bukkit.Location;
 
 public class CuboidHandler {
 	
-	public static String cuboidTable = "edgecuboid_cuboids";
-	public static String habitatTable = "edgecuboid_habitats";
+	public final static String cuboidTable = "edgecuboid_cuboids";
+	public final static String habitatTable = "edgecuboid_habitats";
 	
-	private HashMap<Integer, Cuboid> cuboids = new LinkedHashMap<>();
-	private HashMap<Integer, Habitat> habitats = new LinkedHashMap<>();
-	private Map<String, Cuboid> creatingPlayers = new HashMap<>();
-	private List<String> searchingPlayers = new ArrayList<>();
+	private static final DatabaseHandler db = EdgeCoreAPI.databaseAPI();
+	
+	private final HashMap<Integer, Cuboid> cuboids = new LinkedHashMap<>();
+	private final HashMap<Integer, Habitat> habitats = new LinkedHashMap<>();
+	private final Map<String, Cuboid> creatingPlayers = new HashMap<>();
+	private final List<String> searchingPlayers = new ArrayList<>();
 	
 	private static final CuboidHandler instance = new CuboidHandler();
-	private final DatabaseHandler db = EdgeCoreAPI.databaseAPI();
 	
 	protected CuboidHandler() { /* ... */ }
 	
@@ -56,18 +57,18 @@ public class CuboidHandler {
 	 * @param loc
 	 * @return Cuboid
 	 */
-	public Cuboid getNearestCuboid(CuboidType type, Location loc) {
+	public Cuboid getNearestCuboid( CuboidType type, Location loc ) {
 		double nearest = 0;
 		Cuboid cuboid = null;
 		
-		for (Cuboid c : cuboids.values()) {
+		for ( Cuboid c : cuboids.values() ) {
 			if (c.getCuboidType() != type.getTypeID()) continue;
 			if (nearest == 0) {
-				nearest = loc.distanceSquared(c.getCenter());
+				nearest = loc.distanceSquared( c.getCenter() );
 				cuboid = c;
 			}
 			
-			if (loc.distanceSquared(c.getCenter()) < nearest) {
+			if ( loc.distanceSquared( c.getCenter() ) < nearest) {
 				nearest = loc.distanceSquared(c.getCenter());
 				cuboid = c;
 			}
@@ -105,7 +106,7 @@ public class CuboidHandler {
 	 * @param player
 	 * @return true/false
 	 */
-	public boolean isCreating(String player) {
+	public boolean isCreating( String player ) {
 		return getCreatingPlayers().containsKey(player);
 	}
 	
@@ -114,8 +115,8 @@ public class CuboidHandler {
 	 * @param player
 	 * @return true/false
 	 */
-	public boolean isSearching(String player) {
-		return getSearchingPlayers().contains(player);
+	public boolean isSearching( String player ) {
+		return getSearchingPlayers().contains( player );
 	}
 	
 	/**
@@ -141,9 +142,9 @@ public class CuboidHandler {
 	public int percentageOfInhabitedHabitats() {
 		int amount = 0;
 		
-		for (Habitat h : habitats.values()) {
+		for ( Habitat h : habitats.values() ) {
 			if (h != null) {
-				if (h.isInhabited()) amount++;
+				if( h.isInhabited() ) amount++;
 			}
 		}
 		
@@ -155,11 +156,12 @@ public class CuboidHandler {
 	 * @return Integer
 	 */
 	public int percentageOfGreenArea() {
+		
 		int amount = 0;
 		
-		for (Cuboid c : cuboids.values()) {
-			if (c != null)
-				if (CuboidType.getType(c.getCuboidType()) == CuboidType.Park || CuboidType.getType(c.getCuboidType()) == CuboidType.Sight) amount++;
+		for ( Cuboid c : cuboids.values() ) {
+			if( c == null ) continue;
+			if ( CuboidType.getType( c.getCuboidType()) == CuboidType.Park || CuboidType.getType(c.getCuboidType()) == CuboidType.Sight ) amount++;
 		}
 		
 		return (int) ((double) amount / amountOfCuboids() * 100);
@@ -214,21 +216,19 @@ public class CuboidHandler {
 	public void registerCuboid(String name, int owner, CuboidType type, Level modifyLevel, Location spawn, Location min, Location max, String enterMsg, String leaveMsg, 
 			List<String> participants, List<CuboidEvent> events, HashMap<Flag, List<String>> flags, List<String> commands) throws Exception {
 		
-		if (existsCuboid(name)) return;
+		if ( existsCuboid( name ) ) return;
 		
-		Cuboid c = new Cuboid(name, generateID(), owner, type, modifyLevel, spawn, min, max, min.getWorld(), enterMsg, leaveMsg, participants, events, flags, commands);
+		final Cuboid c = new Cuboid(name, generateID(), owner, type, modifyLevel, spawn, min, max, min.getWorld(), enterMsg, leaveMsg, participants, events, flags, commands);
 		registerCuboid(c);
 	}
 	
-	private void registerCuboid(Cuboid cuboid) {
+	private void registerCuboid( Cuboid cuboid ) {
 		try {
 			
-			byte[] cuboidByteArray = cuboid.toByteArray();
+			final Blob blob = new SerialBlob( cuboid.toByteArray() );
 			
-			Blob blob = null;
-			blob = new SerialBlob(cuboidByteArray);
-			
-			PreparedStatement registerCuboid = db.prepareUpdate("INSERT INTO " + CuboidHandler.cuboidTable + " (id, cuboid) VALUES (?, ?);");
+			final PreparedStatement registerCuboid = db.prepareUpdate("INSERT INTO " + CuboidHandler.cuboidTable + " (id, cuboid) VALUES (?, ?);");
+
 			registerCuboid.setInt(1, cuboid.getID());
 			registerCuboid.setBlob(2, blob);
 			registerCuboid.executeUpdate();
@@ -244,13 +244,13 @@ public class CuboidHandler {
 	 * Deletes an existing cuboid
 	 * @param id
 	 */
-	public void deleteCuboid(int id) {
+	public void deleteCuboid( int id ) {
 		if (id <= 0) return;
 		if (!existsCuboid(id)) return;
 		
 		try {
 			
-			PreparedStatement deleteCuboid = db.prepareUpdate("DELETE FROM " + CuboidHandler.cuboidTable + " WHERE id = '" + id + "';");
+			final PreparedStatement deleteCuboid = db.prepareUpdate("DELETE FROM " + CuboidHandler.cuboidTable + " WHERE id = '" + id + "';");
 			deleteCuboid.executeUpdate();
 			
 			getCuboids().remove(id);
@@ -276,16 +276,15 @@ public class CuboidHandler {
 		
 		try {
 			
-			Habitat h = new Habitat(c, type, owner, tenant, worth, buyable, rental, rentable, upgrades);
-			byte[] habitatByteArray = h.toByteArray();
-			Blob blob = new SerialBlob(habitatByteArray);
+			final Habitat h = new Habitat(c, type, owner, tenant, worth, buyable, rental, rentable, upgrades);
+			Blob blob = new SerialBlob( h.toByteArray() );
 			
 			PreparedStatement registerHabitat = db.prepareUpdate("INSERT INTO " + CuboidHandler.habitatTable + " (cuboidid, habitat) VALUES (?, ?);");
 			registerHabitat.setInt(1, c.getID());
 			registerHabitat.setBlob(2, blob);
 			registerHabitat.executeUpdate();
 			
-			synchronizeHabitat(h.getCuboidID());
+			synchronizeHabitat( h.getCuboidID() );
 			
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -302,7 +301,7 @@ public class CuboidHandler {
 		
 		try {
 		 	
-			PreparedStatement deleteHabitat = db.prepareUpdate("DELETE FROM " + CuboidHandler.habitatTable + " WHERE cuboidid = '" + id + "';");
+			final PreparedStatement deleteHabitat = db.prepareUpdate("DELETE FROM " + CuboidHandler.habitatTable + " WHERE cuboidid = '" + id + "';");
 			deleteHabitat.executeUpdate();
 			
 			getHabitats().remove(id);
@@ -329,8 +328,8 @@ public class CuboidHandler {
 	 * @throws Exception
 	 */
 	public int greatestID() throws Exception {
-		List<Map<String, Object>> tempVar = db.getResults("SELECT COUNT(id) AS amount FROM " + CuboidHandler.cuboidTable);
-		int tempID = Integer.parseInt(String.valueOf(tempVar.get(0).get("amount")));
+		final List<Map<String, Object>> tempVar = db.getResults("SELECT COUNT(id) AS amount FROM " + CuboidHandler.cuboidTable);
+		final int tempID = Integer.parseInt(String.valueOf(tempVar.get(0).get("amount")));
 		
 		if (tempID <= 0) return 1;
 
@@ -360,8 +359,8 @@ public class CuboidHandler {
 	 * @param name
 	 * @return true/false
 	 */
-	public boolean existsCuboid(String name) {
-		for (Cuboid c : getCuboids().values()) {
+	public boolean existsCuboid( String name ) {
+		for ( Cuboid c : getCuboids().values() ) {
 			if (c != null) 
 				return c.getName().equalsIgnoreCase(name);
 		}
@@ -374,7 +373,7 @@ public class CuboidHandler {
 	 * @param h
 	 * @return true/false
 	 */
-	public boolean existsHabitat(Habitat h) {
+	public boolean existsHabitat( Habitat h ) {
 		return getHabitats().containsValue(h);
 	}
 	
@@ -383,7 +382,7 @@ public class CuboidHandler {
 	 * @param id
 	 * @return true/false
 	 */
-	public boolean existsHabitat(int id) {
+	public boolean existsHabitat( int id ) {
 		return getHabitats().containsKey(id);
 	}
 	
@@ -392,9 +391,9 @@ public class CuboidHandler {
 	 * @param name
 	 * @return true/false
 	 */
-	public boolean existsHabitat(String name) {
-		for (Habitat h : getHabitats().values()) {
-			if (h.getCuboid().getName().equals(name)) return true;
+	public boolean existsHabitat( String name ) {
+		for ( Habitat h : getHabitats().values() ) {
+			if ( h.getCuboid().getName().equals( name ) ) return true;
 		}
 		
 		return false;
@@ -405,7 +404,7 @@ public class CuboidHandler {
 	 * @param id
 	 * @return Cuboid
 	 */
-	public Cuboid getCuboid(int id) {
+	public Cuboid getCuboid( int id ) {
 		return getCuboids().get(id);
 	}
 	
@@ -414,8 +413,8 @@ public class CuboidHandler {
 	 * @param name
 	 * @return Cuboid
 	 */
-	public Cuboid getCuboid(String name) {
-		for (Cuboid c : getCuboids().values()) {
+	public Cuboid getCuboid( String name ) {
+		for (Cuboid c : getCuboids().values() ) {
 			if (c != null)
 				if (c.getName().equalsIgnoreCase(name)) return c;
 		}
@@ -428,8 +427,8 @@ public class CuboidHandler {
 	 * @param id
 	 * @return Habitat
 	 */
-	public Habitat getHabitat(int id) {
-		return getHabitats().get(id);
+	public Habitat getHabitat( int id ) {
+		return getHabitats().get( id );
 	}
 	
 	/**
@@ -437,7 +436,7 @@ public class CuboidHandler {
 	 * @param name
 	 * @return Habitat
 	 */
-	public Habitat getHabitat(String name) {
+	public Habitat getHabitat( String name ) {
 		for (Habitat h : getHabitats().values()) {
 			if (h != null)
 				if (h.getCuboid().getName().equalsIgnoreCase(name)) return h;
@@ -451,7 +450,7 @@ public class CuboidHandler {
 	 * @param owner
 	 * @return Habitat
 	 */
-	public Habitat getHabitatByOwner(String owner) {
+	public Habitat getHabitatByOwner( String owner ) {
 		for (Habitat h : getHabitats().values()) {
 			if (h != null)
 				if (h.getOwner().equalsIgnoreCase(owner)) return h;
@@ -465,7 +464,7 @@ public class CuboidHandler {
 	 * @param tenant
 	 * @return Habitat
 	 */
-	public Habitat getHabitatByTenant(String tenant) {
+	public Habitat getHabitatByTenant( String tenant ) {
 		for (Habitat h : getHabitats().values()) {
 			if (h != null)
 				if (h.getTenant().equalsIgnoreCase(tenant)) return h;
@@ -480,7 +479,7 @@ public class CuboidHandler {
 	 * @param cuboids
 	 * @param habitats
 	 */
-	public void synchronizeCuboidManagement(boolean cuboids, boolean habitats) {
+	public void synchronizeCuboidManagement( boolean cuboids, boolean habitats ) {
 		try {
 			
 			if (cuboids)
@@ -505,32 +504,30 @@ public class CuboidHandler {
 	public synchronized void synchronizeCuboid(int id) {
 		try {
 			
-			if (existsCuboid(id)) {
+			if ( existsCuboid(id) ) {
 				
-				byte[] array = getCuboid(id).toByteArray();
-				
-				PreparedStatement sync = db.prepareUpdate("UPDATE " + CuboidHandler.cuboidTable + " SET cuboid = ? WHERE id = '" + id + "';");
-				Blob blob = new SerialBlob(array);
+				final PreparedStatement sync = db.prepareUpdate("UPDATE " + CuboidHandler.cuboidTable + " SET cuboid = ? WHERE id = '" + id + "';");
+				final Blob blob = new SerialBlob( getCuboid( id ).toByteArray() );
 				
 				sync.setBlob(1, blob);
 				sync.executeUpdate();
 				
-				Cuboid synced = Cuboid.toCuboid(getCuboid(id).toByteArray());
-				getCuboids().put(id, synced);
+				final Cuboid synced = Cuboid.toCuboid(getCuboid(id).toByteArray());
+				getCuboids().put( id, synced);
 				
 				return;
 			}
 			
-			List<Map<String, Object>> results = db.getResults("SELECT * FROM " + CuboidHandler.cuboidTable + " WHERE id = '" + id + "';");
+			final List<Map<String, Object>> results = db.getResults("SELECT * FROM " + CuboidHandler.cuboidTable + " WHERE id = '" + id + "';");
 			
-			if (results.isEmpty()) {
+			if ( results.isEmpty() ) {
 				EdgeCuboid.log.info(EdgeCuboid.cuboidbanner + "No Synchronizable Cuboid Entries Found! Cancelling synchronization..");
 				return;
 			}
 			
-			byte[] byteToCuboid = (byte[]) results.get(0).get("cuboid");
+			final byte[] byteToCuboid = (byte[]) results.get(0).get("cuboid");
 			
-			Cuboid cuboid = Cuboid.toCuboid(byteToCuboid);			
+			final Cuboid cuboid = Cuboid.toCuboid(byteToCuboid);			
 			getCuboids().put(cuboid.getID(), cuboid);
 			
 		} catch(Exception e) {
@@ -546,30 +543,29 @@ public class CuboidHandler {
 		try {
 			
 			if (existsHabitat(id)) {
-				byte[] array = getHabitat(id).toByteArray();
-				
-				PreparedStatement sync = db.prepareUpdate("UPDATE " + CuboidHandler.habitatTable + " SET habitat = ? WHERE cuboidid = '" + id + "';");
-				Blob blob = new SerialBlob(array);
+			
+				final PreparedStatement sync = db.prepareUpdate("UPDATE " + CuboidHandler.habitatTable + " SET habitat = ? WHERE cuboidid = '" + id + "';");
+				final Blob blob = new SerialBlob( getHabitat( id ).toByteArray() );
 				
 				sync.setBlob(1, blob);
 				sync.executeUpdate();
 				
-				Habitat synced = Habitat.toHabitat(getHabitat(id).toByteArray());
+				final Habitat synced = Habitat.toHabitat(getHabitat(id).toByteArray());
 				getHabitats().put(id, synced);
 				
 				return;
 			}
 			
-			List<Map<String, Object>> results = db.getResults("SELECT * FROM " + CuboidHandler.habitatTable + " WHERE cuboidid = '" + id + "';");
+			final List<Map<String, Object>> results = db.getResults("SELECT * FROM " + CuboidHandler.habitatTable + " WHERE cuboidid = '" + id + "';");
 			
 			if (results.isEmpty()) {
 				EdgeCuboid.log.info(EdgeCuboid.cuboidbanner + "No Synchronizable Habitat Entries Found! Cancelling synchronization..");
 				return;
 			}
 			
-			byte[] byteToHabitat = (byte[]) results.get(0).get("habitat");
+			final byte[] byteToHabitat = (byte[]) results.get(0).get("habitat");
 			
-			Habitat habitat = Habitat.toHabitat(byteToHabitat);			
+			final Habitat habitat = Habitat.toHabitat(byteToHabitat);			
 			getHabitats().put(habitat.getCuboidID(), habitat);
 			
 		} catch(Exception e) {

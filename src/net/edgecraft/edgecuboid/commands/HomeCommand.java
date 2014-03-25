@@ -21,16 +21,17 @@ import org.bukkit.entity.Player;
 
 public class HomeCommand extends AbstractCommand {
 	
-	private final CuboidHandler cuboidHandler = EdgeCuboidAPI.cuboidAPI();
+	private final static CuboidHandler cuboidHandler = EdgeCuboidAPI.cuboidAPI();
 	
 	private static final HomeCommand instance = new HomeCommand();
 	
-	private HomeCommand() { super(); }
+	private HomeCommand() { /* ... */ }
 	
 	public static final HomeCommand getInstance() {
 		return instance;
 	}
 	
+	// wtf?
 	@Override
 	public Level getLevel() {
 		return Level.valueOf(EdgeCuboid.getInstance().getConfig().getString("Command.home"));
@@ -38,14 +39,13 @@ public class HomeCommand extends AbstractCommand {
 
 	@Override
 	public String[] getNames() {
-		String[] names = { "home", "h" };
-		return names;
+		return new String[]{ "home" };
 	}
 
 	@Override
 	public boolean runImpl(Player player, User user, String[] args) throws Exception {
 		
-		String userLang = user.getLanguage();
+		final String userLang = user.getLanguage();
 		
 		try {
 			
@@ -60,7 +60,7 @@ public class HomeCommand extends AbstractCommand {
 					return true;
 				}
 				
-				Habitat habitat = cuboidHandler.getHabitat(args[2]);
+				final Habitat habitat = cuboidHandler.getHabitat(args[2]);
 				
 				if (!habitat.isBuyable()) {
 					player.sendMessage(lang.getColoredMessage(userLang, "home_buy_notbuyable"));
@@ -77,7 +77,7 @@ public class HomeCommand extends AbstractCommand {
 					return true;
 				}
 				
-				BankAccount acc = EdgeConomyAPI.economyAPI().getAccount(player.getName());
+				final BankAccount acc = EdgeConomyAPI.economyAPI().getAccount(player.getName());
 				
 				if (acc == null) {
 					player.sendMessage(lang.getColoredMessage(userLang, "noaccount"));
@@ -103,7 +103,7 @@ public class HomeCommand extends AbstractCommand {
 			if (args[1].equalsIgnoreCase("sell")) {
 				if (args.length == 3) {
 										
-					Habitat habitat = cuboidHandler.getHabitatByOwner(player.getName());
+					final Habitat habitat = cuboidHandler.getHabitatByOwner(player.getName());
 					
 					if (habitat == null) {
 						player.sendMessage(lang.getColoredMessage(userLang, "home_sell_nohome"));
@@ -115,7 +115,7 @@ public class HomeCommand extends AbstractCommand {
 						return true;
 					}
 					
-					double price = Double.parseDouble(args[2]);
+					final double price = Double.parseDouble(args[2]);
 										
 					if (price <= 0) {
 						player.sendMessage(lang.getColoredMessage(userLang, "amounttoolow"));
@@ -141,7 +141,7 @@ public class HomeCommand extends AbstractCommand {
 						return true;
 					}
 					
-					Habitat habitat = cuboidHandler.getHabitat(args[3]);
+					final Habitat habitat = cuboidHandler.getHabitat(args[3]);
 					
 					if  (!habitat.isOwner(player.getName())) {
 						player.sendMessage(lang.getColoredMessage(userLang, "admin_home_notowner"));
@@ -152,7 +152,7 @@ public class HomeCommand extends AbstractCommand {
 						return true;
 					}
 					
-					double price = Double.parseDouble(args[2]);
+					final double price = Double.parseDouble(args[2]);
 										
 					if (price <= 0) {
 						player.sendMessage(lang.getColoredMessage(userLang, "amounttoolow"));
@@ -183,8 +183,8 @@ public class HomeCommand extends AbstractCommand {
 					return true;
 				}
 				
-				Habitat habitat = cuboidHandler.getHabitat(args[2]);
-				BankAccount acc = EdgeConomyAPI.economyAPI().getAccount(player.getName());
+				final Habitat habitat = cuboidHandler.getHabitat(args[2]);
+				final BankAccount acc = EdgeConomyAPI.economyAPI().getAccount(player.getName());
 				
 				if (acc == null) {
 					player.sendMessage(lang.getColoredMessage(userLang, "noaccount"));
@@ -216,7 +216,7 @@ public class HomeCommand extends AbstractCommand {
 			if (args[1].equalsIgnoreCase("rent")) {
 				if (args.length == 3) {
 										
-					Habitat habitat = cuboidHandler.getHabitatByOwner(player.getName());
+					final Habitat habitat = cuboidHandler.getHabitatByOwner(player.getName());
 					
 					if (habitat == null) {
 						player.sendMessage(lang.getColoredMessage(userLang, "home_nohome"));
@@ -228,7 +228,7 @@ public class HomeCommand extends AbstractCommand {
 						return true;
 					}
 					
-					double price = Double.parseDouble(args[2]);
+					final double price = Double.parseDouble(args[2]);
 										
 					if (price <= 0) {
 						player.sendMessage(lang.getColoredMessage(userLang, "amounttoolow"));
@@ -255,7 +255,7 @@ public class HomeCommand extends AbstractCommand {
 						return true;
 					}
 					
-					Habitat habitat = cuboidHandler.getHabitat(args[3]);
+					final Habitat habitat = cuboidHandler.getHabitat(args[3]);
 					
 					if  (!habitat.isOwner(player.getName())) {
 						player.sendMessage(lang.getColoredMessage(userLang, "admin_home_notowner"));
@@ -266,7 +266,7 @@ public class HomeCommand extends AbstractCommand {
 						return true;
 					}
 					
-					double price = Double.parseDouble(args[2]);
+					final double price = Double.parseDouble(args[2]);
 										
 					if (price <= 0) {
 						player.sendMessage(lang.getColoredMessage(userLang, "amounttoolow"));
@@ -311,14 +311,14 @@ public class HomeCommand extends AbstractCommand {
 						return true;
 					}
 										
-					Habitat habitat = cuboidHandler.getHabitat(args[3]);
+					final Habitat habitat = cuboidHandler.getHabitat(args[3]);
 					
 					if (habitat == null) {
 						player.sendMessage(lang.getColoredMessage(userLang, "unknowncuboid").replace("[0]", args[3]));
 						return true;
 					}
 										
-					Upgrade upgrade = new Upgrade(UpgradeType.valueOf(args[4]));
+					final Upgrade upgrade = new Upgrade(UpgradeType.valueOf(args[4]));
 					
 					if (habitat.getUpgrades().containsKey(upgrade) && !upgrade.multipleUsage()) {
 						player.sendMessage(lang.getColoredMessage(userLang, "admin_upgrade_unlock_notmultiple"));
@@ -339,14 +339,14 @@ public class HomeCommand extends AbstractCommand {
 						return true;
 					}
 					
-					Habitat habitat = cuboidHandler.getHabitat(args[3]);
+					final Habitat habitat = cuboidHandler.getHabitat(args[3]);
 					
 					if (habitat == null) {
 						player.sendMessage(lang.getColoredMessage(userLang, "unknowncuboid").replace("[0]", args[3]));
 						return true;
 					}
 										
-					Upgrade upgrade = new Upgrade(UpgradeType.valueOf(args[4]));
+					final Upgrade upgrade = new Upgrade(UpgradeType.valueOf(args[4]));
 					
 					if (!habitat.getUpgrades().containsKey(upgrade)) {
 						player.sendMessage(lang.getColoredMessage(userLang, "admin_upgrade_remove_notunlocked"));
@@ -373,7 +373,7 @@ public class HomeCommand extends AbstractCommand {
 				
 				if (args[2].equalsIgnoreCase("list")) {
 					
-					StringBuilder sb = new StringBuilder();
+					final StringBuilder sb = new StringBuilder();
 					
 					for (UpgradeType upgrade : Upgrade.UpgradeType.values()) {
 						if (sb.length() > 0)
@@ -397,24 +397,17 @@ public class HomeCommand extends AbstractCommand {
 
 	@Override
 	public void sendUsageImpl(CommandSender sender) {
-		if (!(sender instanceof Player)) return;
-		
 		sender.sendMessage(EdgeCore.usageColor + "/home buy <habitat>");
 		sender.sendMessage(EdgeCore.usageColor + "/home sell <price> [<habitat>]");
 		sender.sendMessage(EdgeCore.usageColor + "/home lease <habitat>");
 		sender.sendMessage(EdgeCore.usageColor + "/home rent <rental> [<habitat>]");
 		sender.sendMessage(EdgeCore.usageColor + "/home info [<habitat>]");
 		
-		User u = EdgeCoreAPI.userAPI().getUser(sender.getName());
+		final User u = EdgeCoreAPI.userAPI().getUser(sender.getName());
 		
 		if (u == null || !Level.canUse(u, Level.ARCHITECT)) return;
 		
 		sender.sendMessage(EdgeCore.usageColor + "/home upgrade");
-	}
-
-	@Override
-	public boolean sysAccess(CommandSender sender, String[] args) {
-		return true;
 	}
 
 	@Override

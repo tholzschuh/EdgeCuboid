@@ -29,12 +29,12 @@ public class HandleCuboidEvents implements Listener {
 		
 		if (EdgeCuboid.isEventTaskReady()) {
 			
-			Player player = event.getPlayer();
-			Location from = event.getFrom();
-			Location to = event.getTo();
+			final Player player = event.getPlayer();
+			final Location from = event.getFrom();
+			final Location to = event.getTo();
 			
-			User user = EdgeCoreAPI.userAPI().getUser(player.getName());
-			Cuboid cuboid = Cuboid.getCuboid(player.getLocation());
+			final User user = EdgeCoreAPI.userAPI().getUser(player.getName());
+			final Cuboid cuboid = Cuboid.getCuboid(player.getLocation());
 			
 			if (user != null) {
 				
@@ -116,63 +116,55 @@ public class HandleCuboidEvents implements Listener {
 	@EventHandler
 	public void handleDamage(EntityDamageEvent event) {
 		
-		Entity entity = event.getEntity();
+		if( !(event.getEntity() instanceof Player) )
+			return;
 		
-		if (entity instanceof Player) {
+		final Player player = (Player) event.getEntity();
+		final Cuboid cuboid = Cuboid.getCuboid(player.getLocation());
 			
-			Player player = (Player) entity;
-			Cuboid cuboid = Cuboid.getCuboid(player.getLocation());
-			
-			if (cuboid != null) {
+		if( cuboid == null ) return;	
+
+		if (cuboid.hasEvent(CuboidEvent.God) ) event.setCancelled(true);
 				
-				if (cuboid.hasEvent(CuboidEvent.God)) {
-					event.setCancelled(true);
-				}
-				
-				if (event instanceof EntityDamageByEntityEvent) {
+		if ( event instanceof EntityDamageByEntityEvent ) {
 					
-					Entity damager = ((EntityDamageByEntityEvent) event).getDamager();
+				Entity damager = ((EntityDamageByEntityEvent) event).getDamager();
 					
-					if (!cuboid.hasEvent(CuboidEvent.PvP)) {
+				if (!cuboid.hasEvent(CuboidEvent.PvP)) {
 						
-						if (damager instanceof Arrow) {
+					if (damager instanceof Arrow) {
 							
-							damager = ((Arrow) damager).getShooter();
+						damager = ((Arrow) damager).getShooter();
 							
-							if (damager instanceof Player)
-								event.setCancelled(true);
-						}
-						
 						if (damager instanceof Player)
 							event.setCancelled(true);
 					}
+						
+					if (damager instanceof Player)
+						event.setCancelled(true);
 				}
 			}
-		}
 	}
 	
 	@EventHandler
 	public void handleChat(AsyncPlayerChatEvent event) {
 		
-		Player player = event.getPlayer();
-		User user = EdgeCoreAPI.userAPI().getUser(player.getName());
+		final Player player = event.getPlayer();
+		final User user = EdgeCoreAPI.userAPI().getUser(player.getName());
 		
-		if (user != null) {
+		if( user == null ) return;
+		
+		final Cuboid cuboid = Cuboid.getCuboid(player.getLocation());
 			
-			Cuboid cuboid = Cuboid.getCuboid(player.getLocation());
-			
-			if (cuboid != null) {				
-				
-				if (cuboid.hasEvent(CuboidEvent.NoChat) && cuboid.getParticipants().contains(player.getName())) {
+		if( cuboid == null ) return;
+		
+		if (cuboid.hasEvent(CuboidEvent.NoChat) && cuboid.getParticipants().contains(player.getName())) {
 					
-					if (!Level.canUse(user, Level.SUPPORTER)) {
+				if (!Level.canUse(user, Level.SUPPORTER)) {
 						
-						event.getRecipients().remove(player.getName());
-						event.setCancelled(true);
-						
-					}
-				}				
-			}
-		}		
+					event.getRecipients().remove(player.getName());
+					event.setCancelled(true);
+				}
+		}				
 	}	
 }

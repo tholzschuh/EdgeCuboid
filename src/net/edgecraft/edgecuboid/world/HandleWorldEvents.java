@@ -3,6 +3,7 @@ package net.edgecraft.edgecuboid.world;
 import net.edgecraft.edgecore.EdgeCoreAPI;
 import net.edgecraft.edgecore.command.Level;
 import net.edgecraft.edgecore.user.User;
+import net.edgecraft.edgecore.user.UserManager;
 import net.edgecraft.edgecuboid.EdgeCuboid;
 import net.edgecraft.edgecuboid.cuboid.Cuboid;
 
@@ -27,68 +28,59 @@ import org.bukkit.util.Vector;
 
 public class HandleWorldEvents implements Listener {
 	
+	private static final UserManager users = EdgeCoreAPI.userAPI();
+	
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void onBorderCollision(PlayerMoveEvent event) {
 		
-		// Check if event tick is ready to go
-		if (EdgeCuboid.isEventTaskReady()) {
+		if( ! EdgeCuboid.isEventTaskReady() ) return;
 			
-			Player player = event.getPlayer();
-			User user = EdgeCoreAPI.userAPI().getUser(player.getName());
-			
-			Location location = player.getLocation().clone();
-			Location spawnLoc = player.getWorld().getHighestBlockAt(player.getWorld().getSpawnLocation()).getLocation();
-			
-			// Check if user exists and it's level > Architect
-			if (user != null) {
-				if (!Level.canUse(user, Level.ARCHITECT)) {
-					
-					// Get radius and distance to radius
-					int radius = WorldManager.getInstance().getWorldBorder();
-					double distance = location.distance(spawnLoc);
+		final Player player = event.getPlayer();
+		final User user = users.getUser(player.getName());
+	
+		if( user == null ) return;
+		
+		final Location location = player.getLocation().clone();
+		final Location spawnLoc = player.getWorld().getHighestBlockAt(player.getWorld().getSpawnLocation()).getLocation();
+		
+		if (!Level.canUse(user, Level.ARCHITECT)) {
+				
+				// Get radius and distance to radius
+				final int radius = WorldManager.getInstance().getWorldBorder();
+				final double distance = location.distance(spawnLoc);
 									
-					if (distance >= radius) {
+				if (distance >= radius) {
 						
-						// Check if the player's in a vehicle
-						Entity vehicle = player.getVehicle();
-						
-						// Let the player leave the vehicle
-						if (vehicle != null) {
-							player.leaveVehicle();
+				final Entity vehicle = player.getVehicle();
+				
+				if (vehicle != null) {
+						player.leaveVehicle();
 							
-							/*
-							 * If the vehicle is an instance of LivingEntity (like horse or pig), teleport it to the from-location
-							 * If not, remove the entity
-							 */
-							if (!(vehicle instanceof LivingEntity)) {
-								vehicle.remove();
-							} else {
-								Vector unit = event.getFrom().toVector().subtract(event.getTo().toVector()).normalize();
-								vehicle.setVelocity(unit.multiply(2));
-								player.sendMessage(EdgeCoreAPI.languageAPI().getColoredMessage(user.getLanguage(), "radiusreached"));
-							}
+						if (!(vehicle instanceof LivingEntity)) {
+							vehicle.remove();
+						} else {
+							final Vector unit = event.getFrom().toVector().subtract(event.getTo().toVector()).normalize();
+							vehicle.setVelocity(unit.multiply(2));
+							player.sendMessage(EdgeCoreAPI.languageAPI().getColoredMessage(user.getLanguage(), "radiusreached"));
 						}
-						
-						// Finally, after all checks, teleport the player to the location it's coming from and let him know why
-						Vector unit = event.getFrom().toVector().subtract(event.getTo().toVector()).normalize();
-						player.setVelocity(unit.multiply(2));
-						player.sendMessage(EdgeCoreAPI.languageAPI().getColoredMessage(user.getLanguage(), "radiusreached"));
 					}
+						
+					final Vector unit = event.getFrom().toVector().subtract(event.getTo().toVector()).normalize();
+					player.setVelocity(unit.multiply(2));
+					player.sendMessage(EdgeCoreAPI.languageAPI().getColoredMessage(user.getLanguage(), "radiusreached"));
 				}
-			}
 		}
 	}
 	
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void onIceMelt(BlockFadeEvent event) {
 		
-		Block block = event.getBlock();
+		final Block block = event.getBlock();
 		
 		if (!WorldManager.getInstance().isIceMeltAllowed()) {
 			if (block.getType() == Material.ICE) {
 				
 				event.setCancelled(true);
-				
 			}
 		}
 	}
@@ -98,7 +90,6 @@ public class HandleWorldEvents implements Listener {
 		if (!WorldManager.getInstance().isFireSpreadAllowed() && Cuboid.getCuboid(event.getBlock().getLocation()) == null) {
 			
 			event.setCancelled(true);
-			
 		}
 	}
 	
@@ -108,7 +99,6 @@ public class HandleWorldEvents implements Listener {
 			if (event.getSource().getType() == Material.FIRE) {
 				
 				event.setCancelled(true);
-				
 			}
 		}
 	}
@@ -118,22 +108,21 @@ public class HandleWorldEvents implements Listener {
 		if (!WorldManager.getInstance().isStructureGrowingAllowed()) {
 			
 			event.setCancelled(true);
-			
 		}
 	}
 	
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void handleItemFrameRotation(PlayerInteractEntityEvent event) {
 		
-		Player player = event.getPlayer();
-		User user = EdgeCoreAPI.userAPI().getUser(player.getName());
+		final Player player = event.getPlayer();
+		User user = users.getUser(player.getName());
 		
 		if (user == null)
 			return;
 		
 		if (event.getRightClicked().getType() == EntityType.ITEM_FRAME) {
 			
-			ItemFrame frame = (ItemFrame) event.getRightClicked();
+			final ItemFrame frame = (ItemFrame) event.getRightClicked();
 			
 			if (frame.getItem() == null || frame.getItem().getType() == Material.AIR)
 				return;

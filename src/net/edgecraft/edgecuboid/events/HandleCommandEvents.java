@@ -18,25 +18,25 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 public class HandleCommandEvents implements Listener {
 	
-	private final LanguageHandler lang = EdgeCoreAPI.languageAPI();
+	private final static LanguageHandler lang = EdgeCoreAPI.languageAPI();
 	
 	@EventHandler
 	public void onCuboidCreation(PlayerInteractEvent event) {
 		
 		if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			
-			Player player = event.getPlayer();
-			User user = EdgeCoreAPI.userAPI().getUser(player.getName());
+			final Player player = event.getPlayer();
+			final User user = EdgeCoreAPI.userAPI().getUser(player.getName());
 			
 			try {
 				
 				if (user != null && CuboidHandler.getInstance().isCreating(player.getName()) && event.getItem() != null) {
 					
-					Material material = event.getItem().getType();
+					final Material material = event.getItem().getType();
 					
 					if (material == WorldManager.getInstance().getCreationItem()) {
 						
-						Cuboid creation = CuboidHandler.getInstance().getCreatingPlayers().get(player.getName());
+						final Cuboid creation = CuboidHandler.getInstance().getCreatingPlayers().get(player.getName());
 						
 						Location spawn = creation.getSpawn();
 						Location minLoc = creation.getMinLocation();
@@ -47,9 +47,9 @@ public class HandleCommandEvents implements Listener {
 							event.setCancelled(true);
 							
 							spawn = event.getClickedBlock().getLocation().clone();
-							String x = maxLoc.getBlockX() + "";
-							String y = maxLoc.getBlockY() + "";
-							String z = maxLoc.getBlockZ() + "";
+							final String x = maxLoc.getBlockX() + "";
+							final String y = maxLoc.getBlockY() + "";
+							final String z = maxLoc.getBlockZ() + "";
 							
 							creation.updateSpawn(spawn);
 							player.sendMessage(lang.getColoredMessage(user.getLanguage(), "cuboid_creation_point").replace("[0]", "Spawn").replace("[1]", x).replace("[2]", y).replace("[3]", z));
@@ -105,17 +105,17 @@ public class HandleCommandEvents implements Listener {
 		
 		if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			
-			Player player = event.getPlayer();
-			User user = EdgeCoreAPI.userAPI().getUser(player.getName());
+			final Player player = event.getPlayer();
+			final User user = EdgeCoreAPI.userAPI().getUser(player.getName());
 			
 			if (user != null && CuboidHandler.getInstance().isSearching(player.getName()) && event.getItem() != null) {
 				
-				Material material = event.getItem().getType();
-				String userLang = user.getLanguage();
+				final Material material = event.getItem().getType();
+				final String userLang = user.getLanguage();
 				
 				if (material == WorldManager.getInstance().getFindItem()) {
 					
-					Cuboid cuboid = Cuboid.getCuboid(event.getClickedBlock().getLocation());
+					final Cuboid cuboid = Cuboid.getCuboid(event.getClickedBlock().getLocation());
 					
 					if (cuboid == null) {						
 						event.setCancelled(true);

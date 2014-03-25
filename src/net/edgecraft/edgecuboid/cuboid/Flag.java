@@ -22,7 +22,7 @@ public enum Flag implements Serializable {
 	EditFlags(8),
 	EditEvents(9);
 	
-	private int id;
+	private final int id;
 	
 	private Flag(int id) {
 		this.id = id;
@@ -34,7 +34,7 @@ public enum Flag implements Serializable {
 	
 	public static Flag[] getFlags() {
 		
-		Flag[] flags = { 
+		final Flag[] flags = { 
 				
 				Flag.BreakBlocks, Flag.PlaceBlocks, Flag.PlaceIllegalBlocks,
 				Flag.InteractAnimals, Flag.InteractRedstone, 
@@ -48,7 +48,7 @@ public enum Flag implements Serializable {
 	
 	public static Flag getFlag(int id) {
 		
-		Flag[] flags = getFlags();
+		final Flag[] flags = getFlags();
 		
 		for (int i = 0; i < flags.length; i++) {
 			if (id == flags[i].getID()) {
@@ -66,10 +66,10 @@ public enum Flag implements Serializable {
 	 * @param player
 	 * @return true/false
 	 */
-	public static boolean hasFlag(Cuboid c, Flag flag, String player) {
+	public static boolean hasFlag( Cuboid c, Flag flag, String player ) {
 		if (c == null || player == null || flag == null) return false;
 		
-		User user = EdgeCoreAPI.userAPI().getUser(player);
+		final User user = EdgeCoreAPI.userAPI().getUser(player);
 		if (user != null && c.isOwner(user)) return true;
 		if (user != null && Level.canUse(user, c.getModifyLevel())) return true;
 		

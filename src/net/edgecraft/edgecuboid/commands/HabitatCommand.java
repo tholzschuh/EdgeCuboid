@@ -23,7 +23,7 @@ public class HabitatCommand extends AbstractCommand {
 	
 	private static final HabitatCommand instance = new HabitatCommand();
 	
-	private HabitatCommand() { super(); }
+	private HabitatCommand() { /* ... */ }
 	
 	public static final HabitatCommand getInstance() {
 		return instance;
@@ -36,8 +36,7 @@ public class HabitatCommand extends AbstractCommand {
 	
 	@Override
 	public String[] getNames() {
-		String[] names = { "habitat", "h" };
-		return names;
+		return new String[]{ "habitat", "h" };
 	}
 	
 	@Override
@@ -47,8 +46,6 @@ public class HabitatCommand extends AbstractCommand {
 	
 	@Override
 	public void sendUsageImpl(CommandSender sender) {
-		if (!(sender instanceof Player)) return;
-		
 		sender.sendMessage(EdgeCore.usageColor + "/habitat create <cuboid> <type> <worth>");
 		sender.sendMessage(EdgeCore.usageColor + "/habitat recreate <habitat> [<type>]");
 		sender.sendMessage(EdgeCore.usageColor + "/habitat delete <habitat>");
@@ -63,7 +60,7 @@ public class HabitatCommand extends AbstractCommand {
 	@Override
 	public boolean runImpl(Player player, User user, String[] args) throws Exception {
 		
-		String userLang = user.getLanguage();
+		final String userLang = user.getLanguage();
 		
 		try {
 			
@@ -78,7 +75,7 @@ public class HabitatCommand extends AbstractCommand {
 					return true;
 				}
 				
-				Cuboid cuboid = cuboidHandler.getCuboid(args[2]);
+				final Cuboid cuboid = cuboidHandler.getCuboid(args[2]);
 				
 				if (cuboid == null) {
 					player.sendMessage(lang.getColoredMessage(userLang, "unknowncuboid").replace("[0]", args[2]));
@@ -90,8 +87,8 @@ public class HabitatCommand extends AbstractCommand {
 					return true;
 				}
 				
-				HabitatType type = HabitatType.valueOf(args[3]);
-				double worth = Double.parseDouble(args[4]);
+				final HabitatType type = HabitatType.valueOf(args[3]);
+				final double worth = Double.parseDouble(args[4]);
 				
 				if (worth <= 0) {
 					player.sendMessage(lang.getColoredMessage(userLang, "amounttoolow"));
@@ -115,7 +112,7 @@ public class HabitatCommand extends AbstractCommand {
 					return true;
 				}
 				
-				Habitat h = cuboidHandler.getHabitat(args[2]);
+				final Habitat h = cuboidHandler.getHabitat(args[2]);
 				
 				if (h == null) {
 					player.sendMessage(lang.getColoredMessage(userLang, "unknownhabitat").replace("[0]", args[2]));
@@ -139,8 +136,8 @@ public class HabitatCommand extends AbstractCommand {
 					return true;
 				}
 				
-				Habitat habitat = cuboidHandler.getHabitat(args[2]);
-				User newOwner = EdgeCoreAPI.userAPI().getUser(args[3]);
+				final Habitat habitat = cuboidHandler.getHabitat(args[2]);
+				final User newOwner = EdgeCoreAPI.userAPI().getUser(args[3]);
 				
 				if (habitat == null) {
 					player.sendMessage(lang.getColoredMessage(userLang, "unknownhabitat").replace("[0]", args[2]));
@@ -169,8 +166,8 @@ public class HabitatCommand extends AbstractCommand {
 					return true;
 				}
 				
-				Habitat habitat = cuboidHandler.getHabitat(args[2]);
-				User newTenant = EdgeCoreAPI.userAPI().getUser(args[3]);
+				final Habitat habitat = cuboidHandler.getHabitat(args[2]);
+				final User newTenant = EdgeCoreAPI.userAPI().getUser(args[3]);
 				
 				if (habitat == null) {
 					player.sendMessage(lang.getColoredMessage(userLang, "unknownhabitat").replace("[0]", args[2]));
@@ -199,8 +196,8 @@ public class HabitatCommand extends AbstractCommand {
 					return true;
 				}
 				
-				Habitat habitat = cuboidHandler.getHabitat(args[2]);
-				double worth = Double.parseDouble(args[3]);
+				final Habitat habitat = cuboidHandler.getHabitat(args[2]);
+				final double worth = Double.parseDouble(args[3]);
 				
 				if (habitat == null) {
 					player.sendMessage(lang.getColoredMessage(userLang, "unknownhabitat").replace("[0]", args[2]));
@@ -229,8 +226,8 @@ public class HabitatCommand extends AbstractCommand {
 					return true;
 				}
 				
-				Habitat habitat = cuboidHandler.getHabitat(args[2]);
-				double rental = Double.parseDouble(args[3]);
+				final Habitat habitat = cuboidHandler.getHabitat(args[2]);
+				final double rental = Double.parseDouble(args[3]);
 				
 				if (habitat == null) {
 					player.sendMessage(lang.getColoredMessage(userLang, "unknownhabitat").replace("[0]", args[2]));
@@ -259,7 +256,7 @@ public class HabitatCommand extends AbstractCommand {
 					return true;
 				}
 				
-				Habitat habitat = cuboidHandler.getHabitat(args[2]);
+				final Habitat habitat = cuboidHandler.getHabitat(args[2]);
 				
 				if (habitat == null) {
 					player.sendMessage(lang.getColoredMessage(userLang, "unknownhabitat").replace("[0]", args[2]));
@@ -280,7 +277,7 @@ public class HabitatCommand extends AbstractCommand {
 			
 			if (args[1].equalsIgnoreCase("types")) {
 				
-				StringBuilder sb = new StringBuilder();
+				final StringBuilder sb = new StringBuilder();
 				
 				for (HabitatType type : HabitatType.getHabitatTypes()) {
 					if (sb.length() > 0)
@@ -298,11 +295,6 @@ public class HabitatCommand extends AbstractCommand {
 			player.sendMessage(lang.getColoredMessage(userLang, "numberformatexception"));
 		}
 		
-		return true;
-	}
-	
-	@Override
-	public boolean sysAccess(CommandSender sender, String[] args) {
 		return true;
 	}
 }

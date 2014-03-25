@@ -20,8 +20,8 @@ public class ConfigHandler {
 	
 	protected ConfigHandler() { /* ... */ }
 	
-	public static final ConfigHandler getInstance(EdgeCuboid plugin) {
-		instance.setPlugin(plugin);
+	public static final ConfigHandler getInstance( EdgeCuboid plugin ) {
+		instance.setPlugin( plugin );
 		return instance;
 	}
 	
@@ -33,42 +33,44 @@ public class ConfigHandler {
 		// Config itself
 		setConfig(getPlugin().getConfig());
 		
+		final FileConfiguration config = getConfig();
+		
 		// Temporary Command Level / TODO Register normally @nicolas @cross
-		getConfig().addDefault("Command.ccancel", Level.ARCHITECT.name());
-		getConfig().addDefault("Command.cfind", Level.USER.name());
-		getConfig().addDefault("Command.cuboid", Level.ARCHITECT.name());
-		getConfig().addDefault("Command.flag", Level.ARCHITECT.name());
-		getConfig().addDefault("Command.event", Level.ARCHITECT.name());
-		getConfig().addDefault("Command.habitat", Level.ARCHITECT.name());
-		getConfig().addDefault("Command.home", Level.USER.name());
-		getConfig().addDefault("Command.upgrade", Level.USER.name());
-		getConfig().addDefault("Command.rail", Level.ARCHITECT.name());
-		getConfig().addDefault("Command.street", Level.ARCHITECT.name());
-		getConfig().addDefault("Command.shop", Level.USER.name());
-		getConfig().addDefault("Command.home", Level.USER.name());
+		config.addDefault("Command.ccancel", Level.ARCHITECT.name());
+		config.addDefault("Command.cfind", Level.USER.name());
+		config.addDefault("Command.cuboid", Level.ARCHITECT.name());
+		config.addDefault("Command.flag", Level.ARCHITECT.name());
+		config.addDefault("Command.event", Level.ARCHITECT.name());
+		config.addDefault("Command.habitat", Level.ARCHITECT.name());
+		config.addDefault("Command.home", Level.USER.name());
+		config.addDefault("Command.upgrade", Level.USER.name());
+		config.addDefault("Command.rail", Level.ARCHITECT.name());
+		config.addDefault("Command.street", Level.ARCHITECT.name());
+		config.addDefault("Command.shop", Level.USER.name());
+		config.addDefault("Command.home", Level.USER.name());
 		
-		getConfig().addDefault("World.BorderRadius", 1000);
-		getConfig().addDefault("World.AllowFrameRotation", false);
-		getConfig().addDefault("World.AllowGlobalBlockInteraction", true);
-		getConfig().addDefault("World.AllowIceMelting", false);
-		getConfig().addDefault("World.AllowFireSpread", false);
-		getConfig().addDefault("World.AllowChunkLoading", true);
-		getConfig().addDefault("World.AllowStructureGrowing", true);
+		config.addDefault("World.BorderRadius", 1000);
+		config.addDefault("World.AllowFrameRotation", false);
+		config.addDefault("World.AllowGlobalBlockInteraction", true);
+		config.addDefault("World.AllowIceMelting", false);
+		config.addDefault("World.AllowFireSpread", false);
+		config.addDefault("World.AllowChunkLoading", true);
+		config.addDefault("World.AllowStructureGrowing", true);
 		
-		getConfig().addDefault("Cuboid.CreationItem", Material.STICK.name());
-		getConfig().addDefault("Cuboid.FindItem", Material.BLAZE_ROD.name());
+		config.addDefault("Cuboid.CreationItem", Material.STICK.name());
+		config.addDefault("Cuboid.FindItem", Material.BLAZE_ROD.name());
 		
-		String[] defaultFrames = new String[] { Material.WOOD_STAIRS.name(), Material.COBBLESTONE_STAIRS.name(), 
+		final String[] defaultFrames = new String[] { Material.WOOD_STAIRS.name(), Material.COBBLESTONE_STAIRS.name(), 
 													Material.BIRCH_WOOD_STAIRS.name(), Material.DARK_OAK_STAIRS.name(), 
 													Material.JUNGLE_WOOD_STAIRS.name(), Material.SPRUCE_WOOD_STAIRS.name(), 
 													Material.NETHER_BRICK_STAIRS.name(), Material.QUARTZ_STAIRS.name(), 
 													Material.SANDSTONE_STAIRS.name(), Material.BRICK_STAIRS.name(), 
 													Material.SMOOTH_STAIRS.name() };
 		
-		getConfig().addDefault("Shop.FrameItems", Arrays.asList(defaultFrames));
-		getConfig().addDefault("Shop.LooseInvOnDeath", false);
+		config.addDefault("Shop.FrameItems", Arrays.asList(defaultFrames));
+		config.addDefault("Shop.LooseInvOnDeath", false);
 		
-		getConfig().options().copyDefaults(true);
+		config.options().copyDefaults(true);
 		getPlugin().saveConfig();
 		
 		if (!new File(getPlugin().getDataFolder() + "src" + File.pathSeparator + "config.yml").exists());
@@ -81,16 +83,18 @@ public class ConfigHandler {
 	 */
 	public final void update() {
 		
-		WorldManager.getInstance().setWorldBorder(getConfig().getInt("World.BorderRadius"));
-		WorldManager.getInstance().setFrameRotation(getConfig().getBoolean("World.AllowFrameRotation"));
-		WorldManager.getInstance().setGlobalBlockInteraction(getConfig().getBoolean("World.AllowGlobalBlockInteraction"));
-		WorldManager.getInstance().setIceMelting(getConfig().getBoolean("World.AllowIceMelting"));
-		WorldManager.getInstance().setFireSpread(getConfig().getBoolean("World.AllowFireSpread"));
-		WorldManager.getInstance().setChunkLoading(getConfig().getBoolean("World.AllowChunkLoading"));
-		WorldManager.getInstance().setStructureGrowing(getConfig().getBoolean("World.AllowStructureGrowing"));
+		final WorldManager worlds = WorldManager.getInstance();
 		
-		WorldManager.getInstance().setCreationItem(Material.getMaterial(getConfig().getString("Cuboid.CreationItem")));
-		WorldManager.getInstance().setFindItem(Material.getMaterial(getConfig().getString("Cuboid.FindItem")));
+		worlds.setWorldBorder(getConfig().getInt("World.BorderRadius"));
+		worlds.setFrameRotation(getConfig().getBoolean("World.AllowFrameRotation"));
+		worlds.setGlobalBlockInteraction(getConfig().getBoolean("World.AllowGlobalBlockInteraction"));
+		worlds.setIceMelting(getConfig().getBoolean("World.AllowIceMelting"));
+		worlds.setFireSpread(getConfig().getBoolean("World.AllowFireSpread"));
+		worlds.setChunkLoading(getConfig().getBoolean("World.AllowChunkLoading"));
+		worlds.setStructureGrowing(getConfig().getBoolean("World.AllowStructureGrowing"));
+		
+		worlds.setCreationItem(Material.getMaterial(getConfig().getString("Cuboid.CreationItem")));
+		worlds.setFindItem(Material.getMaterial(getConfig().getString("Cuboid.FindItem")));
 		
 		ShopHandler.setShopFrames(getConfig().getStringList("Shop.FrameItems"));
 		ShopHandler.toggleInventoryLoosing(getConfig().getBoolean("Shop.LooseInvOnDeath"));

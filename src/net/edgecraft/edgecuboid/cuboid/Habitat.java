@@ -53,14 +53,13 @@ public class Habitat implements Serializable {
 	public static Habitat toHabitat(byte[] byteArray) {
 		try {
 			
-			ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArray);
-			ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+			final ObjectInputStream in = new ObjectInputStream( new ByteArrayInputStream( byteArray ) );
 
 			@SuppressWarnings("unchecked")
-			Map<String, Object> infoMap = (Map<String, Object>) objectInputStream.readObject();
+			final Map<String, Object> infoMap = (Map<String, Object>) in.readObject();
 			
-			Habitat habitat = new Habitat();
-			habitat.deserialize(infoMap);
+			final Habitat habitat = new Habitat();
+			habitat.deserialize( infoMap );
 			
 			return habitat;
 			
@@ -77,11 +76,10 @@ public class Habitat implements Serializable {
 	public byte[] toByteArray() {
 		try {
 			
-			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-			ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
-			objectOutputStream.writeObject(this.serialize());
+			final ByteArrayOutputStream out = new ByteArrayOutputStream();
+			new ObjectOutputStream( out ).writeObject( this.serialize() );
 			
-			return byteArrayOutputStream.toByteArray();
+			return out.toByteArray();
 			
 		} catch (Exception exc) {
 			exc.printStackTrace();
@@ -94,7 +92,9 @@ public class Habitat implements Serializable {
 	 * @return Map<String, Object>
 	 */
 	private Map<String, Object> serialize() {
-		Map<String, Object> infoMap = new LinkedHashMap<String, Object>();
+		
+		final Map<String, Object> infoMap = new LinkedHashMap<String, Object>();
+		
 		infoMap.put("object-type", "Habitat");
 		
 		// Put information
@@ -118,7 +118,8 @@ public class Habitat implements Serializable {
 	 * @param infoMap
 	 */
 	@SuppressWarnings("unchecked")
-	private void deserialize(Map<String, Object> infoMap) {
+	private void deserialize( Map<String, Object> infoMap ) {
+		
 		if (!infoMap.containsKey("object-type") || !infoMap.get("object-type").equals("Habitat")) throw new java.util.UnknownFormatFlagsException("No Habitat");
 		
 		setCuboid(CuboidHandler.getInstance().getCuboid((int) infoMap.get("cuboid")));
@@ -172,7 +173,7 @@ public class Habitat implements Serializable {
 	 * @return true/false
 	 */
 	public boolean isTenant(String user) {
-		return user.equals(getTenant());
+		return user.equals( getTenant() );
 	}
 	
 	/**
@@ -180,7 +181,7 @@ public class Habitat implements Serializable {
 	 * @return true/false
 	 */
 	public boolean isInhabited() {
-		return tenant == null;
+		return ( tenant == null );
 	}
 
 	/**
@@ -220,7 +221,7 @@ public class Habitat implements Serializable {
 	 * @return Double
 	 */
 	public double getTaxes() {
-		return Math.round((double) (getCuboid().getArea() / 100) * (getWorth() / 100));
+		return Math.round( (double) ( getCuboid().getArea() / 100 ) * ( getWorth() / 100 ));
 	}
 	
 	/**
@@ -251,17 +252,15 @@ public class Habitat implements Serializable {
 	 * Unlocks the given upgrade or adds one if already unlocked
 	 * @param upgrade
 	 */
-	public void unlockUpgrade(Upgrade upgrade) {
-		if(!upgrade.multipleUsage()) return;
+	public void unlockUpgrade( Upgrade upgrade ) {
+		if( !upgrade.multipleUsage() ) return;
 		
-		if (getUpgrades().containsKey(upgrade)) {
-			if (upgrade.multipleUsage())
-				getUpgrades().put(upgrade, getUpgrades().get(upgrade) + 1);
+		if( getUpgrades().containsKey(upgrade) ) {
+				getUpgrades().put( upgrade, getUpgrades().get(upgrade) + 1 );
 			
 		} else {
 			
 			getUpgrades().put(upgrade, 1);
-			
 		}
 	}
 	
@@ -269,10 +268,10 @@ public class Habitat implements Serializable {
 	 * Removes an upgrade
 	 * @param upgrade
 	 */
-	public void removeUpgrade(Upgrade upgrade) {
-		if (!getUpgrades().containsKey(upgrade)) return;
+	public void removeUpgrade( Upgrade upgrade ) {
+		if ( !getUpgrades().containsKey(upgrade) ) return;
 		
-		if (getUpgrades().get(upgrade) == 1)
+		if ( getUpgrades().get(upgrade) == 1 )
 			getUpgrades().remove(upgrade);
 		else
 			getUpgrades().put(upgrade, getUpgrades().get(upgrade) - 1);
@@ -282,7 +281,7 @@ public class Habitat implements Serializable {
 	 * Sets the type
 	 * @param i
 	 */
-	protected void setHabitatType(HabitatType type) {
+	protected void setHabitatType( HabitatType type ) {
 		if (type != null)
 			this.type = type;
 	}
@@ -291,8 +290,8 @@ public class Habitat implements Serializable {
 	 * Sets the owner
 	 * @param owner
 	 */
-	protected void setOwner(String owner) {
-		if (owner != null)
+	protected void setOwner( String owner ) {
+		if (owner != null && owner.trim().length() > 0 )
 			this.owner = owner;
 	}
 	
@@ -300,8 +299,8 @@ public class Habitat implements Serializable {
 	 * Switches the owner
 	 * @param newOwner
 	 */
-	public void switchOwner(String newOwner) {
-		setOwner(newOwner);
+	public void switchOwner( String newOwner ) {
+		setOwner( newOwner );
 	}
 
 	/**
@@ -317,7 +316,7 @@ public class Habitat implements Serializable {
 	 * Switches the tenant
 	 * @param newTenant
 	 */
-	public void switchTenant(String newTenant) {
+	public void switchTenant( String newTenant ) {
 		setTenant(newTenant);
 	}
 
@@ -325,7 +324,7 @@ public class Habitat implements Serializable {
 	 * Sets the worth
 	 * @param worth
 	 */
-	protected void setWorth(double worth) {
+	protected void setWorth( double worth ) {
 		if (worth > 0)
 			this.worth = worth;
 	}
@@ -334,7 +333,7 @@ public class Habitat implements Serializable {
 	 * Updates the worth (should might be calculated in own methods)
 	 * @param worth
 	 */
-	public void updateWorth(double worth) {
+	public void updateWorth( double worth ) {
 		setWorth(worth);
 	}
 	
@@ -342,7 +341,7 @@ public class Habitat implements Serializable {
 	 * Sets the availability of being able to get bought
 	 * @param buyable
 	 */
-	protected void setBuyableStatus(boolean buyable) {
+	protected void setBuyableStatus( boolean buyable ) {
 		this.buyable = buyable;
 	}
 	
@@ -350,21 +349,22 @@ public class Habitat implements Serializable {
 	 * Sets the availability of being able to get bought
 	 * @param var
 	 */
-	public void setBuyable(boolean var) {
+	public void setBuyable( boolean var ) {
+		
 		setBuyableStatus(var);
 		
 		if (isBuyable())
 			setRentableStatus(false);
 		else
-			setRentableStatus(isRentable());
+			setRentableStatus( isRentable() );
 	}
 
 	/**
 	 * Sets the rental
 	 * @param rental
 	 */
-	protected void setRental(double rental) {
-		if (rental > getWorth())
+	protected void setRental( double rental ) {
+		if ( rental > getWorth() )
 			this.rental = getWorth();
 		
 		if (rental > 0)
@@ -375,7 +375,7 @@ public class Habitat implements Serializable {
 	 * Updates the rental
 	 * @param rental
 	 */
-	public void updateRental(double rental) {
+	public void updateRental( double rental ) {
 		setRental(rental);
 	}
 
@@ -383,7 +383,7 @@ public class Habitat implements Serializable {
 	 * Sets the availability of being able to get rented
 	 * @param rentable
 	 */
-	protected void setRentableStatus(boolean rentable) {
+	protected void setRentableStatus( boolean rentable ) {
 		this.rentable = rentable;
 	}
 	
@@ -391,7 +391,7 @@ public class Habitat implements Serializable {
 	 * Updates the availability of being able to get rented
 	 * @param var
 	 */
-	public void setRentable(boolean var) {
+	public void setRentable( boolean var ) {
 		setRentableStatus(var);
 	}
 	
@@ -399,11 +399,12 @@ public class Habitat implements Serializable {
 	 * Sets the cuboid which will get connected with this habitat
 	 * @param c
 	 */
-	protected void setCuboid(Cuboid c) {
-		if (c != null) {
-			this.cuboid = c;
-			setCuboidID(c.getID());
-		}
+	protected void setCuboid( Cuboid c ) {
+		
+		if( c == null ) return;
+
+		this.cuboid = c;
+		setCuboidID(c.getID());
 	}
 	
 	/**

@@ -24,14 +24,13 @@ public enum CuboidEvent implements Serializable {
 	
 	public static CuboidEvent[] getCuboidEvents() {
 		
-		CuboidEvent[] types = { CuboidEvent.PvP, CuboidEvent.God, CuboidEvent.Heal, CuboidEvent.Hurt, CuboidEvent.Invis, CuboidEvent.NoChat, CuboidEvent.NoEnter };
+		final CuboidEvent[] types = { CuboidEvent.PvP, CuboidEvent.God, CuboidEvent.Heal, CuboidEvent.Hurt, CuboidEvent.Invis, CuboidEvent.NoChat, CuboidEvent.NoEnter };
 		return types;
-		
 	}
 	
 	public static CuboidEvent getType(int id) {
 		
-		CuboidEvent[] types = getCuboidEvents();
+		final CuboidEvent[] types = getCuboidEvents();
 		
 		for (int i = 0; i < types.length; i++) {
 			if (id == types[i].getTypeID()) {
@@ -48,8 +47,8 @@ public enum CuboidEvent implements Serializable {
 	 * @param event
 	 * @return true/false
 	 */
-	public static boolean hasEvent(Cuboid c, CuboidEvent event) {
-		if (c == null || event == null) return false;
+	public static boolean hasEvent( Cuboid c, CuboidEvent event ) {
+		if ( c == null || event == null ) return false;
 		
 		return c.getEvents().contains(event);
 	}
@@ -59,9 +58,9 @@ public enum CuboidEvent implements Serializable {
 	 * @param c
 	 * @param event
 	 */
-	public static void enableEvent(Cuboid c, CuboidEvent event) {
-		if (c == null || event == null) return;
-		if (c.getEvents().contains(event)) return;
+	public static void enableEvent( Cuboid c, CuboidEvent event ) {
+		if ( c == null || event == null ) return;
+		if ( c.getEvents().contains(event) ) return;
 		
 		c.getEvents().add(event);
 	}

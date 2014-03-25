@@ -84,20 +84,18 @@ public class EdgeItemStack {
 	
 	@SuppressWarnings("deprecation")
 	public ItemStack toBukkitItemStack() {
-		ItemStack itemStack = new ItemStack(type, amount, durability, data);
-		return itemStack;
+		return new ItemStack( type, amount, durability, data );
 	}
 	
 	public static EdgeItemStack toItemStack(byte[] byteArray) {
 		try {
 			
-			ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArray);
-			ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+			final ObjectInputStream in = new ObjectInputStream( new ByteArrayInputStream( byteArray ) );
 			
 			@SuppressWarnings("unchecked")
-			Map<String, Object> infoMap = (Map<String, Object>) objectInputStream.readObject();
+			final Map<String, Object> infoMap = (Map<String, Object>) in.readObject();
 			
-			EdgeItemStack edgeItemStack = new EdgeItemStack();
+			final EdgeItemStack edgeItemStack = new EdgeItemStack();
 			edgeItemStack.deserialize(infoMap);
 			
 			return edgeItemStack;
@@ -111,11 +109,12 @@ public class EdgeItemStack {
 	public byte[] toByteArray() {
 		try {
 			
-			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-			ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
-			objectOutputStream.writeObject(serialize());
+			final ByteArrayOutputStream out = new ByteArrayOutputStream();
+			new ObjectOutputStream( out ).writeObject( this.serialize() );
 			
-			return byteArrayOutputStream.toByteArray();
+			
+			
+			return out.toByteArray();
 			
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -124,7 +123,7 @@ public class EdgeItemStack {
 	}
 	
 	private Map<String, Object> serialize() {
-		Map<String, Object> infoMap = new LinkedHashMap<String, Object>();
+		final Map<String, Object> infoMap = new LinkedHashMap<String, Object>();
 		infoMap.put("object-type", "EdgeItemStack");
 		
 		infoMap.put("type", type);
@@ -138,7 +137,7 @@ public class EdgeItemStack {
 		infoMap.put("lore", itemMeta.getLore());
 		
 		// Enchantments
-		Map<String, Integer> enchantmentList = new LinkedHashMap<String, Integer>();
+		final Map<String, Integer> enchantmentList = new LinkedHashMap<String, Integer>();
 		
 		for (Enchantment enchantment : itemMeta.getEnchants().keySet()) {
 			enchantmentList.put(enchantment.getName(), itemMeta.getEnchants().get(enchantment));
@@ -148,7 +147,7 @@ public class EdgeItemStack {
 		
 		// Meta Data
 		if (itemMeta instanceof BookMeta) {
-			BookMeta bookMeta = (BookMeta) itemMeta;
+			final BookMeta bookMeta = (BookMeta) itemMeta;
 			
 			infoMap.put("meta-type", "book");
 			infoMap.put("book-author", bookMeta.getAuthor());
@@ -156,11 +155,11 @@ public class EdgeItemStack {
 			infoMap.put("book-pages", bookMeta.getPages());
 			
 		} else if (itemMeta instanceof EnchantmentStorageMeta) {
-			EnchantmentStorageMeta enchantmentStorageMeta = (EnchantmentStorageMeta) itemMeta;
+			final EnchantmentStorageMeta enchantmentStorageMeta = (EnchantmentStorageMeta) itemMeta;
 			
 			infoMap.put("meta-type", "enchantmentstorage");
 			
-			Map<String, Integer> serializedEnchantment = new LinkedHashMap<String, Integer>();
+			final Map<String, Integer> serializedEnchantment = new LinkedHashMap<String, Integer>();
 			
 			for (Enchantment enchantment : enchantmentStorageMeta.getStoredEnchants().keySet()) {
 				serializedEnchantment.put(enchantment.getName(), enchantmentStorageMeta.getStoredEnchants().get(enchantment));
@@ -169,16 +168,16 @@ public class EdgeItemStack {
 			infoMap.put("enchantmentstorage-stored", serializedEnchantment);
 			
 		} else if (itemMeta instanceof FireworkEffectMeta) {
-			FireworkEffectMeta fireworkEffectMeta = (FireworkEffectMeta) this.itemMeta;
+			final FireworkEffectMeta fireworkEffectMeta = (FireworkEffectMeta) this.itemMeta;
 			
 			infoMap.put("meta-type", "fireworkeffect");
 			infoMap.put("fireworkeffect-haseffect", fireworkEffectMeta.hasEffect());
 			
-			List<Integer> serializedColors = new ArrayList<Integer>();			
+			final List<Integer> serializedColors = new ArrayList<Integer>();			
 			for (Color color : fireworkEffectMeta.getEffect().getColors()) serializedColors.add(color.asRGB());			
 			infoMap.put("fireworkeffect-colors", serializedColors);
 			
-			List<Integer> serializedFadeColors = new ArrayList<Integer>();			
+			final List<Integer> serializedFadeColors = new ArrayList<Integer>();			
 			for (Color color : fireworkEffectMeta.getEffect().getFadeColors()) serializedFadeColors.add(color.asRGB());			
 			infoMap.put("fireworkeffect-fadecolors", serializedFadeColors);
 			
@@ -187,12 +186,12 @@ public class EdgeItemStack {
 			infoMap.put("fireworkeffect-trail", fireworkEffectMeta.getEffect().hasTrail());
 			
 		} else if(itemMeta instanceof FireworkMeta) {
-			FireworkMeta fireworkMeta = (FireworkMeta) this.itemMeta;
+			final FireworkMeta fireworkMeta = (FireworkMeta) this.itemMeta;
 			
 			infoMap.put("meta-type", "firework");
 			infoMap.put("firework-power", fireworkMeta.getPower());
 			
-			List<Map<String, Object>> fireworkEffects = new ArrayList<Map<String, Object>>();
+			final List<Map<String, Object>> fireworkEffects = new ArrayList<Map<String, Object>>();
 			
 			for (FireworkEffect fireworkEffect : fireworkMeta.getEffects()) {
 				Map<String, Object> serializedEffect = new LinkedHashMap<String, Object>();
@@ -215,23 +214,23 @@ public class EdgeItemStack {
 			infoMap.put("firework-effects", fireworkEffects);
 			
 		} else if (this.itemMeta instanceof LeatherArmorMeta) {
-			LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) this.itemMeta;
+			final LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) this.itemMeta;
 			
 			infoMap.put("meta-type", "leather-armor");
 			infoMap.put("leather-armor-color", leatherArmorMeta.getColor().serialize());
 			
 		} else if (this.itemMeta instanceof MapMeta) {
-			MapMeta mapMeta = (MapMeta) this.itemMeta;
+			final MapMeta mapMeta = (MapMeta) this.itemMeta;
 			
 			infoMap.put("meta-type", "map");
 			infoMap.put("map-scaling", mapMeta.isScaling());
 			
 		} else if (this.itemMeta instanceof PotionMeta) {
-			PotionMeta potionMeta = (PotionMeta) this.itemMeta;
+			final PotionMeta potionMeta = (PotionMeta) this.itemMeta;
 			
 			infoMap.put("meta-type", "potion");
 			
-			List<Map<String, Object>> potionEffects = new ArrayList<Map<String, Object>>();
+			final List<Map<String, Object>> potionEffects = new ArrayList<Map<String, Object>>();
 			
 			for (PotionEffect potionEffect : potionMeta.getCustomEffects()) {
 				Map<String, Object> serializedEffect = new LinkedHashMap<String, Object>();
@@ -277,27 +276,27 @@ public class EdgeItemStack {
 		itemMeta.setLore(infoMap.get("lore") != null ? (List<String>) infoMap.get("lore") : null);
 		
 		// Enchantments
-		Map<String, Integer> enchantmentList = (Map<String, Integer>) infoMap.get("enchantments");
+		final Map<String, Integer> enchantmentList = (Map<String, Integer>) infoMap.get("enchantments");
 		for (String enchantmentName : enchantmentList.keySet()) {
 			
-			int enchantmentLevel = enchantmentList.get(enchantmentName);
+			final int enchantmentLevel = enchantmentList.get(enchantmentName);
 			itemMeta.addEnchant(Enchantment.getByName(enchantmentName), enchantmentLevel, true);
 			
 		}
 		
 		// Item Meta
-		String metaType = (String) infoMap.get("meta-type");
+		final String metaType = (String) infoMap.get("meta-type");
 		if (metaType == null) return;
 
 		if (metaType.equals("book")) {
-			BookMeta bookMeta = (BookMeta) this.itemMeta;
+			final BookMeta bookMeta = (BookMeta) this.itemMeta;
 			
 			bookMeta.setAuthor((String) infoMap.get("book-author"));
 			bookMeta.setTitle((String) infoMap.get("book-title"));
 			bookMeta.setPages((List<String>) infoMap.get("book-pages"));
 			
 		} else if (metaType.equals("enchantmentstorage")) {
-			EnchantmentStorageMeta enchantmentStorageMeta = (EnchantmentStorageMeta) this.itemMeta;
+			final EnchantmentStorageMeta enchantmentStorageMeta = (EnchantmentStorageMeta) this.itemMeta;
 			
 			Map<String, Integer> serializedEnchantment = (Map<String, Integer>) infoMap.get("enchantmentstorage-stored");
 			for (String enchantmentName : serializedEnchantment.keySet()) {
@@ -308,17 +307,17 @@ public class EdgeItemStack {
 			}
 			
 		} else if (metaType.equals("fireworkeffect")) {
-			FireworkEffectMeta fireworkEffectMeta = (FireworkEffectMeta) this.itemMeta;
+			final FireworkEffectMeta fireworkEffectMeta = (FireworkEffectMeta) this.itemMeta;
 
-			Builder builder = FireworkEffect.builder();
+			final Builder builder = FireworkEffect.builder();
 			
 			if ((boolean) infoMap.get("fireworkeffect-haseffect") == true) {
 				
-				List<Color> serializedColors = new ArrayList<Color>();				
+				final List<Color> serializedColors = new ArrayList<Color>();				
 				for (Integer colorRGB : (List<Integer>) infoMap.get("fireworkeffect-colors")) serializedColors.add(Color.fromRGB(colorRGB));
 				builder.withColor(serializedColors);
 
-				List<Color> serializedFadeColors = new ArrayList<Color>();
+				final List<Color> serializedFadeColors = new ArrayList<Color>();
 				for (Integer colorRGB : (List<Integer>) infoMap.get("fireworkeffect-fadecolors")) serializedFadeColors.add(Color.fromRGB(colorRGB));
 				builder.withFade(serializedFadeColors);
 
@@ -331,20 +330,21 @@ public class EdgeItemStack {
 			fireworkEffectMeta.setEffect(builder.build());
 			
 		} else if (metaType.equals("firework")) {
-			FireworkMeta fireworkMeta = (FireworkMeta) this.itemMeta;
+			final FireworkMeta fireworkMeta = (FireworkMeta) this.itemMeta;
 
 			fireworkMeta.setPower((int) infoMap.get("firework-power"));
 
-			List<Map<String, Object>> fireworkEffects = (List<Map<String, Object>>) infoMap.get("firework-effects");
+			final List<Map<String, Object>> fireworkEffects = (List<Map<String, Object>>) infoMap.get("firework-effects");
+
 			for (Map<String, Object> serializedEffect : fireworkEffects) {
 				
-				Builder builder = FireworkEffect.builder();
+				final Builder builder = FireworkEffect.builder();
 
-				List<Color> serializedColors = new ArrayList<Color>();
+				final List<Color> serializedColors = new ArrayList<Color>();
 				for (Integer colorRGB : (List<Integer>) serializedEffect.get("colors")) serializedColors.add(Color.fromRGB(colorRGB));
 				builder.withColor(serializedColors);
 
-				List<Color> serializedFadeColors = new ArrayList<Color>();
+				final List<Color> serializedFadeColors = new ArrayList<Color>();
 				for (Integer colorRGB : (List<Integer>) serializedEffect.get("fadecolors")) serializedFadeColors.add(Color.fromRGB(colorRGB));
 				builder.withFade(serializedFadeColors);
 
@@ -356,26 +356,26 @@ public class EdgeItemStack {
 			}
 			
 		} else if (metaType.equals("leather-armor")) {
-			LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) this.itemMeta;
+			final LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) this.itemMeta;
 			
 			leatherArmorMeta.setColor(Color.deserialize((Map<String, Object>) infoMap.get("leather-armor-color")));
 			
 		} else if (metaType.equals("map")) {
-			MapMeta mapMeta = (MapMeta) this.itemMeta;
+			final MapMeta mapMeta = (MapMeta) this.itemMeta;
 			
 			mapMeta.setScaling((boolean) infoMap.get("map-scaling"));
 			
 		} else if (metaType.equals("potion")) {
-			PotionMeta potionMeta = (PotionMeta) this.itemMeta;
+			final PotionMeta potionMeta = (PotionMeta) this.itemMeta;
 			
-			List<Map<String, Object>> potionEffects = (List<Map<String, Object>>) infoMap.get("potion-effects");
+			final List<Map<String, Object>> potionEffects = (List<Map<String, Object>>) infoMap.get("potion-effects");
 			for (Map<String, Object> potionEffect : potionEffects) {
 				potionMeta.addCustomEffect(new PotionEffect(potionEffect), true);
 			}
 			
 		} else if (metaType.equals("skull")) {
 			
-			SkullMeta skullMeta = (SkullMeta) this.itemMeta;
+			final SkullMeta skullMeta = (SkullMeta) this.itemMeta;
 			skullMeta.setOwner((String) infoMap.get("skull-owner"));
 			
 		}

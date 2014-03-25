@@ -25,14 +25,13 @@ import org.bukkit.inventory.ItemStack;
 public class ShopCommand extends AbstractCommand {
 	
 	private static final ShopCommand instance = new ShopCommand();
+	private static final ShopHandler shopHandler = EdgeCuboidAPI.shopAPI();
 	
-	private ShopCommand() { super(); }
+	private ShopCommand() { /* ... */ }
 	
 	public static final ShopCommand getInstance() {
 		return instance;
 	}
-	
-	private final ShopHandler shopHandler = EdgeCuboidAPI.shopAPI();
 	
 	@Override
 	public Level getLevel() {
@@ -47,7 +46,7 @@ public class ShopCommand extends AbstractCommand {
 	@Override
 	public boolean runImpl(Player player, User user, String[] args) throws Exception {
 		
-		String userLang = user.getLanguage();
+		final String userLang = user.getLanguage();
 		
 		try {
 			
@@ -62,7 +61,7 @@ public class ShopCommand extends AbstractCommand {
 					return true;
 				}
 				
-				Shop shop = shopHandler.getShop(player.getName());
+				final Shop shop = shopHandler.getShop(player.getName());
 				
 				if (!shop.isBuyable()) {
 					player.sendMessage(lang.getColoredMessage(userLang, "shop_notbuyable"));
@@ -74,7 +73,7 @@ public class ShopCommand extends AbstractCommand {
 					return true;
 				}
 				
-				BankAccount acc = EdgeConomyAPI.economyAPI().getAccount(user.getID());
+				final BankAccount acc = EdgeConomyAPI.economyAPI().getAccount(user.getID());
 				
 				if (acc == null) {
 					player.sendMessage(lang.getColoredMessage(userLang, "noaccount"));
@@ -105,7 +104,7 @@ public class ShopCommand extends AbstractCommand {
 					return true;
 				}
 				
-				Shop shop = shopHandler.getShop(player.getName());
+				final Shop shop = shopHandler.getShop(player.getName());
 				
 				if (!shop.isRentable()) {
 					player.sendMessage(lang.getColoredMessage(userLang, "shop_notrentable"));
@@ -117,7 +116,7 @@ public class ShopCommand extends AbstractCommand {
 					return true;
 				}
 				
-				BankAccount acc = EdgeConomyAPI.economyAPI().getAccount(user.getID());
+				final BankAccount acc = EdgeConomyAPI.economyAPI().getAccount(user.getID());
 				
 				if (acc == null) {
 					player.sendMessage(lang.getColoredMessage(userLang, "noaccount"));
@@ -145,7 +144,7 @@ public class ShopCommand extends AbstractCommand {
 						return true;
 					}
 					
-					Shop shop = shopHandler.getShop(player.getName());					
+					final Shop shop = shopHandler.getShop(player.getName());					
 					addItem(player, user, shop, player.getItemInHand(), Double.parseDouble(args[2]));
 					
 					return true;
@@ -158,7 +157,7 @@ public class ShopCommand extends AbstractCommand {
 						return true;
 					}
 					
-					Shop shop = shopHandler.getShop(player.getName());					
+					final Shop shop = shopHandler.getShop(player.getName());					
 					addItem(player, user, shop, player.getItemInHand(), Double.parseDouble(args[2]));
 					
 					return true;
@@ -173,7 +172,7 @@ public class ShopCommand extends AbstractCommand {
 						return true;
 					}
 					
-					Shop shop = shopHandler.getShop(player.getName());					
+					final Shop shop = shopHandler.getShop(player.getName());					
 					getItem(player, user, shop, player.getItemInHand());
 					
 					return true;
@@ -186,7 +185,7 @@ public class ShopCommand extends AbstractCommand {
 						return true;
 					}
 					
-					Shop shop = shopHandler.getShop(player.getName());					
+					final Shop shop = shopHandler.getShop(player.getName());					
 					getItem(player, user, shop, player.getItemInHand());
 					
 					return true;
@@ -199,14 +198,14 @@ public class ShopCommand extends AbstractCommand {
 					return true;
 				}
 				
-				Shop shop = shopHandler.getShop(player.getName());
+				final Shop shop = shopHandler.getShop(player.getName());
 				
 				if (shop == null) {
 					player.sendMessage(lang.getColoredMessage(userLang, "noshop"));
 					return true;
 				}
 				
-				ItemStack item = new ItemStack(Material.valueOf(args[2].toUpperCase()));
+				final ItemStack item = new ItemStack(Material.valueOf(args[2].toUpperCase()));
 				
 				if (item == null || item.getType() == Material.AIR) {
 					player.sendMessage(lang.getColoredMessage(userLang, "invaliditem"));
@@ -218,7 +217,7 @@ public class ShopCommand extends AbstractCommand {
 					return true;
 				}
 				
-				double price = Double.parseDouble(args[3]);
+				final double price = Double.parseDouble(args[3]);
 				
 				shop.addItem(new EdgeItemStack(item), price);
 				player.sendMessage(lang.getColoredMessage(userLang, "shop_itemprice_success").replace("[0]", args[2]).replace("[1]", price + ""));
@@ -297,7 +296,7 @@ public class ShopCommand extends AbstractCommand {
 						return true;
 					}
 					
-					Cuboid cuboid = CuboidHandler.getInstance().getCuboid(args[2]);
+					final Cuboid cuboid = CuboidHandler.getInstance().getCuboid(args[2]);
 					
 					if (cuboid == null) {
 						player.sendMessage(lang.getColoredMessage(userLang, "unknowncuboid").replace("[0]", args[2]));
@@ -309,7 +308,7 @@ public class ShopCommand extends AbstractCommand {
 						return true;
 					}
 					
-					ShopType type = ShopType.valueOf(args[3]);
+					final ShopType type = ShopType.valueOf(args[3]);
 					
 					shopHandler.registerShop(cuboid, type, player.getName(), 2500D, false, 0, false, null, 0, false);
 					player.sendMessage(lang.getColoredMessage(userLang, "admin_shop_create_success").replace("[0]", args[2]));
@@ -324,7 +323,7 @@ public class ShopCommand extends AbstractCommand {
 						return true;
 					}
 					
-					Cuboid cuboid = CuboidHandler.getInstance().getCuboid(args[2]);
+					final Cuboid cuboid = CuboidHandler.getInstance().getCuboid(args[2]);
 					
 					if (cuboid == null) {
 						player.sendMessage(lang.getColoredMessage(userLang, "unknowncuboid").replace("[0]", args[2]));
@@ -341,7 +340,7 @@ public class ShopCommand extends AbstractCommand {
 						return true;
 					}
 					
-					ShopType type = ShopType.valueOf(args[3]);
+					final ShopType type = ShopType.valueOf(args[3]);
 					
 					shopHandler.registerShop(cuboid, type, args[4], 2500D, false, 0, false, null, 0, false);
 					player.sendMessage(lang.getColoredMessage(userLang, "admin_shop_create_success_owner").replace("[0]", args[2]));
@@ -362,7 +361,7 @@ public class ShopCommand extends AbstractCommand {
 					return true;
 				}
 				
-				Shop shop = shopHandler.getShop(args[2]);
+				final Shop shop = shopHandler.getShop(args[2]);
 				
 				if (shop == null) {
 					player.sendMessage(lang.getColoredMessage(userLang, "unknownshop").replace("[0]", args[2]));
@@ -396,8 +395,8 @@ public class ShopCommand extends AbstractCommand {
 					return true;
 				}
 				
-				Shop shop = shopHandler.getShop(args[2]);
-				User newOwner = EdgeCoreAPI.userAPI().getUser(args[3]);
+				final Shop shop = shopHandler.getShop(args[2]);
+				final User newOwner = EdgeCoreAPI.userAPI().getUser(args[3]);
 				
 				if (shop == null) {
 					player.sendMessage(lang.getColoredMessage(userLang, "unknownshop").replace("[0]", args[2]));
@@ -436,7 +435,7 @@ public class ShopCommand extends AbstractCommand {
 					return true;
 				}
 				
-				Shop shop = shopHandler.getShop(args[2]);
+				final Shop shop = shopHandler.getShop(args[2]);
 				boolean var = Boolean.parseBoolean(args[3]);
 				
 				if (shop == null) {
@@ -467,8 +466,8 @@ public class ShopCommand extends AbstractCommand {
 					return true;
 				}
 				
-				Shop shop = shopHandler.getShop(args[2]);
-				double rental = Double.parseDouble(args[3]);
+				final Shop shop = shopHandler.getShop(args[2]);
+				final double rental = Double.parseDouble(args[3]);
 				
 				if (shop == null) {
 					player.sendMessage(lang.getColoredMessage(userLang, "unknownshop").replace("[0]", args[2]));
@@ -502,7 +501,7 @@ public class ShopCommand extends AbstractCommand {
 					return true;
 				}
 				
-				Shop shop = shopHandler.getShop(args[2]);
+				final Shop shop = shopHandler.getShop(args[2]);
 				boolean var = Boolean.parseBoolean(args[3]);
 				
 				if (shop == null) {
@@ -533,7 +532,7 @@ public class ShopCommand extends AbstractCommand {
 					return true;
 				}
 				
-				StringBuilder sb = new StringBuilder();
+				final StringBuilder sb = new StringBuilder();
 				
 				for (ShopType type : ShopType.values()) {
 					if (sb.length() > 0)
@@ -556,18 +555,17 @@ public class ShopCommand extends AbstractCommand {
 
 	@Override
 	public void sendUsageImpl(CommandSender sender) {
-		if (!(sender instanceof Player)) return;
 		
 		sender.sendMessage(EdgeCore.usageColor + "/shop buy <shop>");
 		sender.sendMessage(EdgeCore.usageColor + "/shop rent <shop>");
-		sender.sendMessage(EdgeCore.usageColor + "/shop additem §m[<amount>] §c<price>");
-		sender.sendMessage(EdgeCore.usageColor + "/shop getitem §m[<amount>]");
+		sender.sendMessage(EdgeCore.usageColor + "/shop additem [<amount>] <price>");
+		sender.sendMessage(EdgeCore.usageColor + "/shop getitem [<amount>]");
 		sender.sendMessage(EdgeCore.usageColor + "/shop itemprice <item> <price>");
 		sender.sendMessage(EdgeCore.usageColor + "/shop near <distance>");
 		sender.sendMessage(EdgeCore.usageColor + "/shop providing <item> <distance>");
 		sender.sendMessage(EdgeCore.usageColor + "/shop overview");
 		
-		User u = EdgeCoreAPI.userAPI().getUser(sender.getName());
+		final User u = EdgeCoreAPI.userAPI().getUser(sender.getName());
 		
 		if (u == null || !Level.canUse(u, Level.ARCHITECT)) return;
 		
@@ -579,11 +577,6 @@ public class ShopCommand extends AbstractCommand {
 		sender.sendMessage(EdgeCore.usageColor + "/shop setrental <shop> <rental>");
 		sender.sendMessage(EdgeCore.usageColor + "/shop setrentable <shop> <boolean>");
 		sender.sendMessage(EdgeCore.usageColor + "/shop types");
-	}
-	
-	@Override
-	public boolean sysAccess(CommandSender arg0, String[] arg1) {
-		return true;
 	}
 
 	@Override
@@ -599,7 +592,7 @@ public class ShopCommand extends AbstractCommand {
 			return;
 		}
 		
-		EdgeItemStack guiItem = new EdgeItemStack(item);
+		final EdgeItemStack guiItem = new EdgeItemStack(item);
 		
 		if (shop.getGuiItems().containsKey(guiItem)) {
 			sender.sendMessage(lang.getColoredMessage(user.getLanguage(), "shop_additem_alreadyused"));
@@ -620,7 +613,7 @@ public class ShopCommand extends AbstractCommand {
 			return;
 		}
 		
-		EdgeItemStack guiItem = new EdgeItemStack(item);
+		final EdgeItemStack guiItem = new EdgeItemStack(item);
 		
 		if (!shop.getGuiItems().containsKey(guiItem)) {
 			sender.sendMessage(lang.getColoredMessage(user.getLanguage(), "shop_getitem_notused"));

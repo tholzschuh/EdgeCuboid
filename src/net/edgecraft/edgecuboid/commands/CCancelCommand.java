@@ -16,39 +16,37 @@ public class CCancelCommand extends AbstractCommand {
 	
 	private static final CCancelCommand instance = new CCancelCommand();
 	
-	private CCancelCommand() { super(); }
+	private CCancelCommand() { /* ... */ }
 	
 	public static final CCancelCommand getInstance() {
 		return instance;
 	}
 	
+	// wtf?
 	@Override
 	public Level getLevel() {
-		return Level.valueOf(EdgeCuboid.getInstance().getConfig().getString("Command.ccancel"));
+		return Level.valueOf( EdgeCuboid.getInstance().getConfig().getString("Command.ccancel") );
 	}
 	
 	@Override
 	public String[] getNames() {
-		String[] names = { "ccancel" };
-		return names;
+		return new String[]{ "ccancel" };
 	}
 	
 	@Override
 	public boolean validArgsRange(String[] args) {
-		return args.length == 1;
+		return ( args.length == 1 );
 	}
 	
 	@Override
 	public  void sendUsageImpl(CommandSender sender) {
-		if (!(sender instanceof Player)) return;
-		
 		sender.sendMessage(EdgeCore.usageColor + "/ccancel");
 	}
 	
 	@Override
-	public boolean runImpl(Player player, User user, String[] args) throws Exception {
+	public boolean runImpl(Player player, User user, String[] args) {
 		
-		String userLang = user.getLanguage();
+		final String userLang = user.getLanguage();
 		
 		cuboidHandler.getCreatingPlayers().remove(player.getName());
 		cuboidHandler.getSearchingPlayers().remove(player.getName());
@@ -57,9 +55,5 @@ public class CCancelCommand extends AbstractCommand {
 		
 		return true;
 	}
-	
-	@Override
-	public boolean sysAccess(CommandSender sender, String[] args) {
-		return true;
-	}
+
 }
